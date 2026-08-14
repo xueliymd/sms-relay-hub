@@ -14,4 +14,5 @@ local.properties
 *.jks
 *.keystore
 work/
-
+debug/*
+!debug/README.md

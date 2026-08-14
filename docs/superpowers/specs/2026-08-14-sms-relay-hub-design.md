@@ -43,6 +43,24 @@ iOS Ve tweak ----------+          |                  |
 
 所有采集端共享版本化 JSON 协议、设备身份、幂等键和错误码。设备端可以更换，后台数据模型和业务 API 不变。
 
+### 3.1 项目目录隔离
+
+最终可交付项目单独存放在 `outputs/sms-relay-hub/`，实施期间使用独立 worktree，生产文件、测试文件和调试材料不得混放：
+
+```text
+sms-relay-hub/
+├── backend/        # FastAPI 服务端及服务端单元测试
+├── web/            # React 管理后台及前端单元测试
+├── android/        # 非 Root Android 工程及 Android 单元测试
+├── ios-shortcut/   # 快捷指令模板、生成工具和安装文档
+├── deploy/         # Compose、Caddy、环境变量和部署脚本
+├── tests/          # 跨组件契约测试与端到端测试
+├── debug/          # 临时诊断脚本、请求样本和日志，默认不提交
+└── docs/           # 设计、实施计划和运维文档
+```
+
+`debug/` 只保留目录使用说明，其余内容由 Git 忽略。各组件自己的测试按工具链约定放在组件内部，`tests/` 只存放需要同时验证两个或更多组件的测试。
+
 ## 4. 技术选型
 
 ### 4.1 服务端
@@ -150,7 +168,7 @@ X-Signature = base64url(HMAC-SHA256(secret, timestamp + "\n" + nonce + "\n" + sh
 }
 ```
 
-服务端限制正文和 metadata 大小，日志永不输出正文、验证码或设备凭据。`device_id + client_message_id` 建唯一约束，重试不会生成重复短信。
+服务端限制正文和 metadata 大小，日志永不输出正文、验证码或设备凭据。`device_id + client_message_id` 建唯一约束，重试不会生成重复短信。首次入库返回 `201`；相同幂等键再次上报时返回 `200` 和原 `message_id`，响应中标记 `duplicate: true`。
 
 ## 7. 验证码解析与状态
 
@@ -232,7 +250,7 @@ Content-Type: application/json
 
 - 设备端仅在 2xx 后确认上传完成。
 - 401/403 停止自动重试并提示凭据失效。
-- 409 返回已存在记录，设备端视为成功。
+- 幂等重复请求返回 200 和 `duplicate: true`，设备端直接视为成功。
 - 429 和 5xx 使用带抖动的指数退避。
 - Android 本地队列设置容量上限，达到上限时保留最新记录并明确告警。
 - Webhook 出口独立重试，不阻塞短信入库。
