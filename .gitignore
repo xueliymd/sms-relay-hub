@@ -2,12 +2,14 @@
 .env.*
 !.env.example
 __pycache__/
+.venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 *.pyc
 node_modules/
 dist/
+*.tsbuildinfo
 .idea/
 .gradle/
 local.properties
