@@ -2,6 +2,36 @@
 
 自托管的授权设备消息中转平台。Android 客户端监听本机新消息并通过 HMAC 上报；iPhone 使用“信息”个人自动化和快捷指令通过 Bearer 上报。服务端把敏感字段用 AES-256-GCM 加密后保存到 PostgreSQL，并提供一次性访问码 Claim API。
 
+## 一键部署
+
+**Linux 服务器（一条命令）**
+
+```sh
+git clone https://github.com/xueliymd/sms-relay-hub.git && cd sms-relay-hub && sh deploy/install.sh
+```
+
+`deploy/install.sh` 依次做四件事：
+
+1. 初始化 `deploy/.env`——自动生成缺失的安全密钥（`ADMIN_PASSWORD` / `ADMIN_TOKEN` / `DATA_ENCRYPTION_KEY` / `POSTGRES_PASSWORD`），**已有的非空值不会被覆盖**；
+2. 跑 `deploy/preflight.sh` 做配置闸门（缺键、端口非法就停下让你先改）；
+3. `docker compose -p deploy --env-file deploy/.env -f deploy/compose.yml up --build -d`；
+4. 打印容器状态、管理台入口和健康检查命令。
+
+可加 `--skip-preflight`（跳过闸门）或 `--no-build`（不重建镜像）。**脚本幂等，重复执行安全。**
+
+前置条件：Docker Engine + `docker compose` v2 插件。默认入口 `http://<服务器IP>:39300/`，管理员用户名默认 `admin`，密码在 `deploy/.env` 里（bootstrap 生成时会在终端只打印一次）。
+
+**Windows**
+
+```powershell
+pwsh -File deploy\bootstrap.ps1
+docker compose -p deploy --env-file deploy/.env -f deploy/compose.yml up --build -d
+```
+
+**⚠️ 已有数据的服务器做版本更新不要用上面这条**，改用更新包里的 `deploy/apply-update.sh`——它会先备份源码、`.env` 和 PostgreSQL dump，失败时三者一起回退。上线命令单与回滚手册见 `docs/UPDATE-COMMANDS-2026.09.12-platform-fixes.md` 与 `docs/DEPLOY_INCIDENT_RECOVERY_2026-09-12.md`。
+
+**项目当前状态、未完成项与待办**：见 `docs/STATUS.md`。
+
 ## 已实现
 
 - FastAPI + SQLAlchemy + Alembic + PostgreSQL 16 持久化。
