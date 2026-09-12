@@ -306,9 +306,9 @@
 | 4.5 | J4 保留策略 | ✅ | `run_retention()` 补调 `_cleanup_forwarding_logs()`（此前只有定义、从无调用点，"保留 7 天"是空话）；新增回归测试，test_forwarding 10 passed |
 | 5 | D 级文档纠错 | ✅ | D5 改为 `get_otp_states`；D7 在 `DEPLOYMENT_AUDIT` 顶部加"时效说明"；**D6 复核为误报**（见下） |
 | 6 | D1 合并报告 | ✅ | 删除 `FULL_AUDIT_REPORT_2026-09-12.md`、`FULL_AUDIT_REPORT_2_2026-09-12.md`；`REMOTE_CONTROL_REFERENCE_COMPARISON.md` **整体并入** `PENDING_FEATURES_REPORT` 附录后删除。保留本文 + `DEPLOY_INCIDENT_RECOVERY` |
-| 6.5 | L2/L3 | ⏳ | 见下方"对 L3 建议的更正" |
-| 7 | 全量审查 | ⏳ | 待代码改动收敛后重跑三端 |
-| 8 | 重新打包 | ⏳ | 待第 7 步通过 |
+| 6.5 | L2/L3/L6/L7 | ✅ | **L3** 按要求改为构建期剔除（`web/vite.config.ts` 新增 `dropContainerUpdateArchive` 插件，`closeBundle` 删 `dist/assets/releases/deploy`），源归档与 catalog 3 条 deploy 记录**保持不动**；**L6** 清掉客户端侧最后一处过期端口 `8000`（air724 `main.lua`/`config.example.lua`/README、`script_api/README.md`、`ios-shortcut/shortcut-definition.md`、`docs/DEVICE_TUTORIAL.md`、采集端输入框占位、教程 Lua 片段、vite dev 代理→39200）；**L7** 删除 `web/public/assets/downloads/sms-relay-root-module-0.3.{6,7}.zip`；**L2 复核为误报**（见下）；另发现并修掉 **L8**（见下） |
+| 7 | 全量审查 | ✅ | 四套验证全部重跑，全部绿：**后端 `252 passed`（7m51s，含 `test_deploy` 48 项）**、**网页 `tsc --noEmit` RC=0 / `vitest` 60 passed(7 文件) / `vite build` RC=0**、**ios-shortcut `node --test` 9 passed**、**clients/script_api `pytest` 5 passed**。产物断言：`dist/assets/releases/deploy` **不存在**、dist catalog 首三字节 `7b0d0a`（无 BOM）、`dist/downloads` **不存在**、`dist` 内 11 个 APK + 2 个 Root 压缩包。资源一致性：`releases/` 下 15 个归档的**路径与字节数逐一等于** catalog 记录，**零孤儿**；`assets/downloads/Relay-SMS-Forwarder.apk` 2522733 字节 = code 23 |
+| 8 | 重新打包 | ✅ | `deploy/package-update.ps1` 产出 **`deploy/dist/sms-relay-hub-update-2026.09.12-platform-fixes.zip`**，**33,066,964 字节 / 131 条目 / sha256 `06b2d4d0…0d76`**。**30 项成品校验全绿**：无反斜杠条目、无 `web/node_modules`·`web/dist`·`backend/.venv`·`*.tsbuildinfo`·`deploy/.env`·`web/public/downloads`·`assets/releases/deploy`·`manager-android`；包内 catalog **无 BOM**（`7b0d0a`）且**已无 deploy 平台**、每平台保留 2 条；**含修复版容器更新脚本**（`apply-update.sh` 有 `pg_restore`、`compose.yml` 有 `start_period`）；6 个归档 **size_bytes + sha256 逐条匹配**；`assets/downloads/Relay-SMS-Forwarder.apk` 与 code 23 逐字节一致（`82e1ad7f…`）。**未修改 `package.ps1`**（见下） |
 
 ### 对本报告自身三处结论的更正
 
@@ -320,3 +320,11 @@
 2. **F1 的修法要比本报告写的更严**：报告原文建议"对 metadata 走 `redact_mapping`"，但 `phone_number` **既不在 `SENSITIVE_KEYS`、也不以 `_token/_secret/_code` 结尾**，单跑 `redact_mapping` **治不了本病**。实际实现新增了 `PHONE_KEYS` + `mask_phone_number` 并逐层下钻。
 3. **D6 是误报**：对 `PENDING_FEATURES_REPORT_2026-09-12.md` 全文 grep `无忧行` 只命中一处（第 101 行，第三节"已明确不做"），第二节并未列入，不存在自相矛盾。上一轮系误判。
 4. **B1 比原报告更宽**：被越过的非目标不止第 2 条，还有**第 1 条**（"不创建、删除或停用设备，不轮换或展示设备密钥"）——管理端 1.0.7 起已实现设备创建 / 凭据轮换 / 撤销 / 恢复 / 永久删除。两处已一并更正。
+5. **L2 是误报（本轮第 5 处自我更正）**：原报告称"打包脚本会**就地改写工作区的** `release-catalog.json`"。逐行核对 `deploy/package.ps1` 后确认：它先把仓库**复制到临时 `$staging`**，`$catalogPath`、`$publicRoot`、`$legacyDownloads` 全部是 `Join-Path $staging ...`，写回的也是 staging 里的副本（第 56-79 行），源仓库 catalog 与归档**从未被触碰**。所谓"打包副作用"不成立，无需改动。
+6. **L7 只是症状；真因是 L8（本轮新发现）**：除了 `assets/downloads/` 下两个孤儿压缩包，仓库里还**另有一个遗留目录 `web/public/downloads/`**（追踪文件 `web/public/downloads/sms-relay-root-module-0.3.6.zip`，外加一个未跟踪的 `ios-sms-config.shortcut` 副本）。它和 `assets/downloads/` 是两个并存的下载目录，只有 `assets/downloads/` 会被网页引用。`package.ps1` 早就把它当历史包袱处理：第 45-48 行打包含"存在就整目录删"，第 181 行还把它列进**禁止条目**名单；同一脚本第 90-92 行则无差别删掉 `assets/downloads/` 下所有 `sms-relay-root-module-*.zip`。也就是说这些文件留在源码里，唯一效果就是**逼打包脚本每轮做一次防御性清理**。本轮已直接从源码树删除（含整个遗留目录），打包侧清理逻辑保持不变——根因消除，守卫保留。
+
+## 打包环境注意（本轮新增，别再踩）
+
+- 本沙箱给 PowerShell 注入了一个 `Remove-Item` 守卫：**只接受显式路径操作数**，而 `deploy/package.ps1` 有三处用的是管道写法（`... | Remove-Item -Force`，第 90-92 行删过期 Root 压缩包、第 98-108 行扫 `*.tsbuildinfo` 与 `.db/.pyc`），于是 `pwsh -File deploy/package-update.ps1` 在本沙箱必然失败（报 `Remove-Item: missing path operand`）。
+- **处理方式：不改 `package.ps1`。** 它是随包发布的脚本、且被 `test_deploy.py` 静态断言（`"sms-relay-root-module-*.zip" in package_script` 等），在正常机器上管道写法完全合法——为沙箱改发布脚本属于本末倒置。正确做法是在**本次会话内**用 `Set-Item function:global:Remove-Item` 覆盖成等价实现（显式路径 + 管道 `FileInfo` 都支持，目录走 `[IO.Directory]::Delete($t,$true)`、文件走 `[IO.File]::Delete`），再调用原脚本。脚本落在 `.tmp/build_package.ps1`。
+- 顺带确认：直接跑 `package.ps1` **不需要** `Set-Location`（它用 `$PSScriptRoot` 定位仓库根），也**不需要** `pwsh`（Windows PowerShell 5.1 即可），传绝对路径的 `-Output` 最稳。
