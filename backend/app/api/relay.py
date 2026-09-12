@@ -6,6 +6,7 @@ import hmac
 import json
 import threading
 import time
+from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from uuid import UUID
@@ -15,6 +16,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from app.core.config import settings
 from app.core.errors import RelayError
+from app.core.redaction import mask_phone_number as _mask_phone_number, scrub_metadata
 from app.db.models import utc_now
 from app.services.admin_message_websocket import (
     AdminMessageSubscription,
@@ -651,15 +653,6 @@ def _validate_sim_slot(slot: int) -> None:
         raise RelayError(422, "invalid_sim_profile", "slot_index is outside the supported range")
 
 
-def _mask_phone_number(phone_number: str | None) -> str | None:
-    if phone_number is None:
-        return None
-    digit_count = sum(character.isdigit() for character in phone_number)
-    if digit_count <= 4:
-        return "*" * len(phone_number)
-    return "*" * (len(phone_number) - 4) + phone_number[-4:]
-
-
 def _serialize_message(message: Any, *, otp_code: str | None = None) -> dict[str, Any]:
     subscription_id = message.metadata.get("subscription_id")
     if not isinstance(subscription_id, int) or isinstance(subscription_id, bool):
@@ -684,7 +677,7 @@ def _serialize_message(message: Any, *, otp_code: str | None = None) -> dict[str
         "otp_status": message.otp_status,
         "otp_code": otp_code,
         "read_at": message.read_at.isoformat() if message.read_at else None,
-        "metadata": message.metadata,
+        "metadata": scrub_metadata(message.metadata) if isinstance(message.metadata, Mapping) else {},
         "redacted": message.redacted,
     }
 

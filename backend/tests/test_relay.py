@@ -393,6 +393,38 @@ def test_shortcut_ingest_accepts_message_object_and_builds_protocol_fields(
     assert listed[0]["created_at"]
 
 
+def test_admin_message_metadata_never_exposes_a_plaintext_phone_number(
+    client: TestClient,
+) -> None:
+    """Shortcut ingest stores the device's own number in ``metadata``.
+
+    The admin API masks the same number as ``receiving_phone_masked``, so the
+    raw value must not ride along in ``metadata`` — otherwise the masking the UI
+    relies on is trivially bypassed by reading the other field.
+    """
+    created = create_device(client, client_type="ios_shortcut", auth_kind="bearer")
+    token = created["credential"]["secret"]
+    payload = relay_payload("metadata-phone-mask-1")
+    payload["metadata"]["phone_number"] = "+15550100005"
+
+    ingested = client.post(
+        "/api/v1/ingest/messages",
+        json=payload,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "X-Idempotency-Key": "metadata-phone-mask-1",
+        },
+    )
+    assert ingested.status_code == 201
+
+    response = client.get("/api/v1/admin/messages", headers=ADMIN_HEADERS)
+    listed = response.json()
+    assert listed[0]["metadata"]["phone_number"] == "********0005"
+    assert listed[0]["receiving_phone_masked"] == "********0005"
+    # The plaintext number must not leak anywhere in the serialized payload.
+    assert "+15550100005" not in response.text
+
+
 def test_shortcut_ingest_can_use_optional_receiving_phone_for_dual_sim(
     client: TestClient,
 ) -> None:

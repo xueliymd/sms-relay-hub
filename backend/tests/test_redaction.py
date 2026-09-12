@@ -1,4 +1,9 @@
-from app.core.redaction import mask_identifier, redact_mapping
+from app.core.redaction import (
+    mask_identifier,
+    mask_phone_number,
+    redact_mapping,
+    scrub_metadata,
+)
 
 
 def test_redaction_removes_sensitive_values_recursively() -> None:

@@ -31,6 +31,40 @@ def _rule_payload(**overrides: Any) -> dict[str, Any]:
     return payload
 
 
+def test_retention_run_purges_forwarding_logs_older_than_seven_days(client: TestClient) -> None:
+    """DEFERRED_FEATURES 3.1 承诺“发送日志保留 7 天”。
+
+    ``_cleanup_forwarding_logs`` 早已写好，但 ``run_retention`` 从未调用它，
+    所以 forwarding_logs 只增不减。本用例钉死这条接线。
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from sqlalchemy import select
+
+    from app.db.models import ForwardingLogModel
+    from app.services.store import store
+
+    now = datetime.now(timezone.utc)
+    with store.session_factory.begin() as session:
+        for rule_name, age_days in (("stale", 8), ("fresh", 1)):
+            session.add(
+                ForwardingLogModel(
+                    rule_name=rule_name,
+                    channel="webhook",
+                    target_masked="https://example.com/****",
+                    status="sent",
+                    created_at=now - timedelta(days=age_days),
+                )
+            )
+
+    assert client.get("/api/v1/admin/forwarding/logs", headers=ADMIN_HEADERS).status_code == 200
+    store.run_retention(30)
+
+    with store.session_factory() as session:
+        remaining = [row.rule_name for row in session.scalars(select(ForwardingLogModel)).all()]
+    assert remaining == ["fresh"]
+
+
 # ---------- CRUD 与鉴权 ----------
 
 

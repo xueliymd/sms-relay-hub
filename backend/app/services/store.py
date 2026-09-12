@@ -1923,6 +1923,10 @@ class RelayStore:
                     self._audit(session, "message.redacted", message.id)
                     redacted += 1
                 self._cleanup_otps(session, utc_now())
+                # 发送日志也要按保留期清理：DEFERRED_FEATURES 3.1 承诺"发送日志保留 7 天"，
+                # 但 _cleanup_forwarding_logs 此前从未被任何地方调用，forwarding_logs
+                # 只增不减。这里补上调用，让承诺与实际一致。
+                self._cleanup_forwarding_logs(session, utc_now())
         return redacted
 
     def age_message(self, message_id: UUID, *, days: int = 0, seconds: int = 0) -> None:
