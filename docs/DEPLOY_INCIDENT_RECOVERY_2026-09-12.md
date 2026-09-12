@@ -301,3 +301,39 @@ ModuleNotFoundError: No module named 'requests'
 
 **顺带记录一个同类隐患**：`backend/app/core/config.py:26` 的 `app_port` 默认值仍是 `8000`
 （被禁止的历史遗留值）。运行时被 compose 的 `APP_PORT=39200` 覆盖所以没暴露，但默认值本身是错的。
+
+### 8.8 结果：已成功上线（2026-09-12 22:19 +08）
+
+用 r2 包重跑，一次通过。关键回执：
+
+| 观察点 | 结果 |
+| --- | --- |
+| 包指纹 | `0a87055e…e354` 与预期一致（33,069,313 字节） |
+| `unzip exit` | `0`（132 条目，无反斜杠） |
+| 包内自检 | `"requests` = 1、`pg_restore` = 1、`start_period` = 2（与预期一致） |
+| 残留清理 | 3 张表 DROP 全部成功；`messages.sender_body_digest` **不存在**（印证 `messages` 当时确实被回滚到了 13:43:26Z 的 dump）；`alembic_version` 已回到 `20260902_0008` |
+| 只检测 | `detect-only: compose project deploy` |
+| **首启** | **`deploy-app-1 Healthy 6.5s`**（上次是 5 秒被判死） |
+| 更新回执 | `update complete; backup retained at /root/relay-update-history/relay-backup-20260912T141930Z` |
+| **迁移版本** | **`20260910_0010`** ← 0009 转发规则 + 0010 远程指令**首次真正落地** |
+| 发布接口 | `/api/v1/releases/android/history` 返回 200 JSON |
+
+**本次事故的三个可复用教训**
+
+1. **容器只装 `pyproject` 的运行时依赖**，本地 venv 的传递依赖会掩盖缺失声明 →
+   「本地全绿 + 容器首启秒退 + health 永不通过」。守卫：`backend/tests/test_dependencies.py`
+   + `.tmp/package_verify.py` 成品包级检查。
+2. **5 秒失败 ≠ 健康检查超时**。`start_period: 60s` + `6×10s` 意味着判定 unhealthy 至少要 60 秒；
+   几秒内就失败，说明是**进程退出**（导入/启动期异常），不是"启动慢"。
+3. **回滚里的 `pg_restore --clean --if-exists` 会被新迁移建的 FK 挡住**：
+   本次 `devices` 因 `device_commands.device_id` 的 FK 无法 DROP，导致
+   **`devices` 保留实时数据、其余表回退到备份时刻**的部分还原。
+   即"源码与库一起回退"这条设计在**同一次失败已经跑过迁移**时会打折。
+   → 后续改进方向：回滚前先 `DROP ... CASCADE` 掉本包新引入的对象，或改用"还原到新库再切换"的方式。
+
+**仍未做（交给用户）**
+
+- 真机验证采集端/管理端：磁贴开关、电池优化页、**远程指令往返**（现在服务端已有 `device_commands`，
+  采集端 `/api/v1/devices/<id>/commands/pending` 应从 404 变 200）。
+- 核对 13:43–13:47（UTC）区间的 `messages` 是否有断档（回滚窗口内新产生的行可能丢失）。
+- 本轮审查遗留项：H2 / H1 / H4 / I1 / J1~J3 / J5 / K2~K3 / L5 / M1，以及 `app_port` 默认值 `8000`。
