@@ -189,7 +189,7 @@ depends on index public.devices_pkey
 ### 8.4 处置顺序
 
 > 根因见 8.7（已确证）。所以现在的顺序是：**确认 → 清残留 → 打新包 → 更新**。
-> 可直接粘贴的命令单：`deploy/dist/DIAG-COMMANDS-2026.09.12-incident2.md`。
+> 可直接粘贴的命令单：`docs/DIAG-COMMANDS-2026.09.12-incident2.md`。
 
 **第 1 步｜2 秒确认根因（在服务器上，对着已解压的包跑）**
 
@@ -296,7 +296,7 @@ ModuleNotFoundError: No module named 'requests'
    回归：后端全量 **254 passed**（原 252 + 新增 2 项依赖守卫，413.68s）。
    **第一版 `-platform-fixes.zip` 作废，不要复用。**
 
-4. `deploy/dist/UPDATE-COMMANDS-2026.09.12-platform-fixes.md` 已同步到 r2 的指纹，
+4. `docs/UPDATE-COMMANDS-2026.09.12-platform-fixes.md` 已同步到 r2 的指纹，
    并在自检步骤里加了 `grep -c '"requests' $SRC/backend/pyproject.toml`（期望 1）作为防拿错包的闸门。
 
 **顺带记录一个同类隐患**：`backend/app/core/config.py:26` 的 `app_port` 默认值仍是 `8000`
