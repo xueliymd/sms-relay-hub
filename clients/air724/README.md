@@ -21,7 +21,7 @@
 编辑 `main.lua` 顶部的 `CONFIG`：
 
 - `host`：Relay 服务器地址或 IP，不填协议头。
-- `port`：Relay 服务器端口；HTTP/WS 测试环境通常为 `8000`，TLS/WSS 环境填对应端口。
+- `port`：Relay 服务器对外入口端口，默认部署为 `39300`；TLS/WSS 环境填上游反向代理的对应端口。
 - `tls`：使用 HTTPS/WSS 时设为 `true`，局域网 HTTP/WS 测试设为 `false`。
 - `script_api_token`：在后台“设备”页添加“合宙 724 取码”设备后显示一次的脚本 API 令牌。
 - `phone_number`：取码手机号，必须与平台中短信接收号码一致。

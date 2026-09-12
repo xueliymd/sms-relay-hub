@@ -82,7 +82,7 @@ class MainActivity : Activity() {
             setPadding(0, dp(8), 0, dp(16))
         })
 
-        baseUrlInput = input("平台地址，例如 http://192.168.5.7:8000")
+        baseUrlInput = input("平台地址，例如 http://192.168.5.7:39300")
         deviceIdInput = input("设备 ID")
         secretInput = input("HMAC 密钥（只在保存时填写）").apply {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD

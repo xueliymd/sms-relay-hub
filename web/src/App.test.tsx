@@ -203,7 +203,20 @@ beforeEach(() => {
           download_url: "/assets/releases/android/12/Relay-SMS-Forwarder-1.0.11.apk",
         }] });
       }
-      if (url.includes("/releases/root/history")) return jsonResponse({ releases: [] });
+      if (url.includes("/releases/root/history")) return jsonResponse({ releases: [{
+        platform: "root",
+        channel: "stable",
+        version_code: 22,
+        version_name: "0.3.10",
+        published_at: "2026-09-05T06:04:26Z",
+        min_sdk: 21,
+        mandatory: false,
+        notes: "Root 模块 0.3.10",
+        size_bytes: 9206923,
+        sha256: "root-sha256",
+        signer_sha256: null,
+        download_url: "/assets/releases/root/22/sms-relay-root-module-0.3.10.zip",
+      }] });
       if (url.includes("/releases/manager/history")) return jsonResponse({ releases: [{
         platform: "manager",
         channel: "stable",
@@ -428,10 +441,11 @@ test("opens the Android Root tutorial from the device view", async () => {
 
   expect(await screen.findByRole("heading", { name: "设备接入演示教程" })).toBeInTheDocument();
   expect(screen.getByRole("tab", { name: "Android 应用" })).toHaveAttribute("aria-selected", "true");
-  expect(screen.getByRole("link", { name: "下载 Relay短信转发 1.0.17.apk" })).toHaveAttribute("href", "/assets/releases/android/18/Relay-SMS-Forwarder-1.0.17.apk");
+  // 教程链接跟随发布目录，不再写死版本号（写死会在下次发版后指向旧包）。
+  expect(screen.getByRole("link", { name: "下载 Relay短信转发 1.0.11.apk" })).toHaveAttribute("href", "/assets/releases/android/12/Relay-SMS-Forwarder-1.0.11.apk");
   fireEvent.click(screen.getByRole("tab", { name: "Android Root 模块" }));
   expect(screen.getByRole("tab", { name: "Android Root 模块" })).toHaveAttribute("aria-selected", "true");
-  expect(screen.getByRole("link", { name: "下载 sms-relay-root-module-0.3.9.zip" })).toHaveAttribute("href", "/assets/releases/root/21/sms-relay-root-module-0.3.9.zip");
+  expect(screen.getByRole("link", { name: "下载 sms-relay-root-module-0.3.10.zip" })).toHaveAttribute("href", "/assets/releases/root/22/sms-relay-root-module-0.3.10.zip");
   expect(screen.getByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("/data/adb/sms-relay/config.json") === true)).toBeInTheDocument();
   expect(screen.getByText((_, element) => element?.className === "tutorial-warning" && element.textContent?.includes("只转发安装并启用模块后收到的新短信") === true)).toBeInTheDocument();
   expect(screen.getByText("arm64-v8a / armeabi-v7a")).toBeInTheDocument();

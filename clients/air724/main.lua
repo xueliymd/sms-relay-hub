@@ -16,7 +16,7 @@ require "common"
 -- Edit only this block before downloading the script to the Air724 device.
 local CONFIG = {
     host = "192.168.1.10",
-    port = 8000,
+    port = 39300,
     tls = false,
     ws_path = "/api/v1/ws/otp",
     claim_path = "/api/v1/otp/claim",

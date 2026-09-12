@@ -2,7 +2,7 @@
 -- Air724U 使用旧版 Lua 5.1 接口；新版 LuatOS 硬件需要单独适配。
 return {
     host = "192.168.1.10",
-    port = 8000,
+    port = 39300,
     tls = false,
     ws_path = "/api/v1/ws/otp",
     claim_path = "/api/v1/otp/claim",

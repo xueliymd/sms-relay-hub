@@ -8,7 +8,7 @@
 from clients.script_api.otp_client import ScriptApiClient
 
 client = ScriptApiClient(
-    "http://127.0.0.1:8000",
+    "http://127.0.0.1:39300",
     "后台创建的脚本 API 令牌",
     "+8613800138000",
 )

@@ -204,6 +204,17 @@ function releaseEntries(value: unknown): ReleaseEntry[] {
   return Array.isArray(releases) ? releases as ReleaseEntry[] : [];
 }
 
+// 教程里的下载按钮必须跟着发布目录走：写死版本号会在下次发版后立刻指向旧包。
+// 发布目录不可用时返回 null，由调用方退化成“去发布历史里挑”的文案，而不是继续展示过期的链接。
+function latestRelease(releases: ReleaseEntry[], platform: ReleaseEntry["platform"]): ReleaseEntry | null {
+  let latest: ReleaseEntry | null = null;
+  for (const entry of releases) {
+    if (entry.platform !== platform) continue;
+    if (!latest || entry.version_code > latest.version_code) latest = entry;
+  }
+  return latest;
+}
+
 export default function App() {
   const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem("relay-admin-token") ?? "");
   const [adminUsername, setAdminUsername] = useState("");
@@ -1364,7 +1375,7 @@ export default function App() {
         </div>
       )}
 
-      {showTutorial && <DeviceTutorial onClose={() => setShowTutorial(false)} />}
+      {showTutorial && <DeviceTutorial onClose={() => setShowTutorial(false)} releases={releaseHistory} />}
       {showApiDoc && <ApiDocModal onClose={() => setShowApiDoc(false)} />}
 
       {showAccountSettings && (
@@ -1547,8 +1558,10 @@ function DataTable({ headers, empty, children }: { headers: string[]; empty: str
   );
 }
 
-function DeviceTutorial({ onClose }: { onClose: () => void }) {
+function DeviceTutorial({ onClose, releases }: { onClose: () => void; releases: ReleaseEntry[] }) {
   const [tutorialTab, setTutorialTab] = useState<"androidApp" | "androidRoot" | "ios" | "air724">("androidApp");
+  const latestAndroid = latestRelease(releases, "android");
+  const latestRoot = latestRelease(releases, "root");
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section className="modal tutorial-modal" role="dialog" aria-modal="true" aria-labelledby="device-tutorial-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -1565,7 +1578,7 @@ function DeviceTutorial({ onClose }: { onClose: () => void }) {
           <button role="tab" aria-selected={tutorialTab === "ios"} className={tutorialTab === "ios" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("ios")}><Smartphone size={16} /> iPhone 快捷指令</button>
           <button role="tab" aria-selected={tutorialTab === "air724"} className={tutorialTab === "air724" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("air724")}><Radio size={16} /> 合宙 724 取码</button>
         </div>
-        {tutorialTab === "androidApp" ? <AndroidAppTutorial /> : tutorialTab === "androidRoot" ? <AndroidRootTutorial /> : tutorialTab === "ios" ? <IosTutorial /> : <Air724Tutorial />}
+        {tutorialTab === "androidApp" ? <AndroidAppTutorial latest={latestAndroid} /> : tutorialTab === "androidRoot" ? <AndroidRootTutorial latest={latestRoot} /> : tutorialTab === "ios" ? <IosTutorial /> : <Air724Tutorial />}
         <div className="modal-actions"><button className="secondary-button" onClick={onClose}>关闭</button></div>
       </section>
     </div>
@@ -1701,7 +1714,7 @@ function Air724Tutorial() {
         </ol>
         <pre className="tutorial-code"><code>{[
           'host = "服务器IP或域名",',
-          'port = 8000,',
+          'port = 39300,',
           'tls = false,',
           'script_api_token = "脚本 API 令牌",',
           'phone_number = "+8613800138000",',
@@ -1732,7 +1745,7 @@ function Air724Tutorial() {
   );
 }
 
-function AndroidAppTutorial() {
+function AndroidAppTutorial({ latest }: { latest: ReleaseEntry | null }) {
   return (
     <div className="tutorial-content">
       <p className="tutorial-lead">适用于普通 Android 手机，不需要 Root。应用只转发安装并配置后收到的新短信。</p>
@@ -1741,7 +1754,9 @@ function AndroidAppTutorial() {
       <section className="tutorial-section" aria-labelledby="android-app-download-title">
         <h3 id="android-app-download-title">1. 下载并安装 Android 应用</h3>
         <ol>
-          <li><a className="tutorial-download" href="/assets/releases/android/18/Relay-SMS-Forwarder-1.0.17.apk" download>下载 Relay短信转发 1.0.17.apk</a>。</li>
+          <li>{latest
+            ? <><a className="tutorial-download" href={latest.download_url} download>下载 Relay短信转发 {latest.version_name}.apk</a>。</>
+            : <>先在“总览”页的“发布历史”里下载最新的 Android 采集端安装包。</>}</li>
           <li>在手机上安装 APK；系统提示允许安装未知来源时，按提示完成授权。</li>
           <li>打开应用，填写平台地址、设备 ID 和 HMAC 密钥。</li>
         </ol>
@@ -1779,7 +1794,7 @@ function AndroidAppTutorial() {
   );
 }
 
-function AndroidRootTutorial() {
+function AndroidRootTutorial({ latest }: { latest: ReleaseEntry | null }) {
   return (
     <div className="tutorial-content">
       <p className="tutorial-lead">适用于 Magisk、KernelSU、APatch。第一版只保留 ARM 真机运行时：<strong>arm64-v8a / armeabi-v7a</strong>。</p>
@@ -1788,7 +1803,9 @@ function AndroidRootTutorial() {
       <section className="tutorial-section" aria-labelledby="android-install-title">
         <h3 id="android-install-title">1. 安装模块</h3>
         <ol>
-          <li><a className="tutorial-download" href="/assets/releases/root/21/sms-relay-root-module-0.3.9.zip" download>下载 sms-relay-root-module-0.3.9.zip</a>。</li>
+          <li>{latest
+            ? <><a className="tutorial-download" href={latest.download_url} download>下载 sms-relay-root-module-{latest.version_name}.zip</a>。</>
+            : <>先在“总览”页的“发布历史”里下载最新的 Root 模块压缩包。</>}</li>
           <li>在 Magisk、KernelSU 或 APatch 的“模块”中选择“从存储安装”，选择 ZIP 后完成安装。</li>
           <li>重启手机并确认模块已启用。打开模块应用，点击“执行”启动控制台并自动跳转；未自动跳转时手动打开 <code>http://127.0.0.1:35000/</code>。</li>
         </ol>
