@@ -129,7 +129,7 @@ v1 已实现：查电量（`query_battery`）、查最近短信（`query_recent_
    ② 网页"设备实时短信"面板在断线重连时用 REST 补拉结果**按 id 覆盖** WS 收到的同一条消息
    （`LiveMessagePanel.mergeMessages`），验证码按钮会**凭空消失**。现 `_serialize_message` 统一带出，
    规则与 WS 完全一致（仅 `available` 且未过期才回码，已领取/已过期只留 `otp_status`）。
-   列表接口用**批量查询**（`store.get_otp_codes`）避免 N+1；单条已读/未读接口同样带上。
+   列表接口用**批量查询**（`store.get_otp_states`，同时返回 status 与 code）避免 N+1；单条已读/未读接口同样带上。
    新增测试锁死"REST 与 WS 同一条消息字段完全一致"。
 2. **`/admin/runtime` 补 `latest_releases`**（各平台 stable 最新版本，直接读发布清单，清单不可读时降级为空对象不 500）；
    网页运行信息面板新增"最新发布版本"一行。`certificate_expires_at` 恒为 `null` 并已在设计侧说明原因

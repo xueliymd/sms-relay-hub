@@ -26,7 +26,7 @@
 
 ### 支持范围
 
-当前正式包为 `sms-relay-root-module-0.3.9.zip`，只包含：
+当前正式包为后台“总览 → 发布历史”里 Root 列表的最新一条（文件名形如 `sms-relay-root-module-x.y.z.zip`），只包含：
 
 - `arm64-v8a`：主流 64 位 Android 真机；
 - `armeabi-v7a`：32 位 ARMv7 设备。
@@ -107,7 +107,7 @@ sh /data/adb/modules/sms-relay-root/action.sh status
 
 ### 需要的参数
 
-- `<RELAY_BASE_URL>`：服务器 IP 和端口，例如 `http://192.168.5.7:8000`；
+- `<RELAY_BASE_URL>`：服务器 IP 和对外端口，例如 `http://192.168.5.7:39300`；
 - `<DEVICE_TOKEN>`：后台创建 iPhone 设备时显示一次的 Token，复制后备用。
 
 ### A. 下载快捷指令并修改配置

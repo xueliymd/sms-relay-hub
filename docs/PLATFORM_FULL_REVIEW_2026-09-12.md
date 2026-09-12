@@ -292,3 +292,31 @@
 | 4.5 | 修 **J4**：把 `_cleanup_forwarding_logs` 接进 `run_retention`（或改文档删掉"保留 7 天"承诺） |
 | 5 之后 | 处理 **K2/K3**：统一措辞并回滚对已跟踪规划文档的改写 |
 | 6.5 | 删 **L3** 的 `releases/deploy/`、修 **L2** 的打包副作用 |
+
+---
+
+## 八、执行记录（2026-09-12 本轮，按第六节顺序）
+
+| 顺序 | 项 | 状态 | 结果 |
+|---|---|---|---|
+| 1 | E1 Git 基线提交 | ✅ | `de37945`（402 文件 / +61,888）、`6d0fc95`（-16 孤儿）、`cf611da`（代码修复）。工作区首次 0 残留。真因：陈旧 `index.lock` + **未忽略的 Gradle `build/`（84MB）触发 Windows 长路径 `error: Filename too long`**，git 失败后还会留下新锁，形成自我循环 |
+| 2 | B1 管理端账号修改 | ✅ | **用户拍板：保留功能、改设计文档**。spec 非目标第 1、2 条已就地更正并补"范围变更记录"；顺手修正同批过期的"只读客户端""全部只读""不显示脚本完整令牌" |
+| 3 | C 级垃圾清理 | ✅ | 释放 212MB：两个 jadx 空壳、`android/app/build`+`manager-android/app/build`(80MB)、`clients/root-module/clients` 嵌套复制(26MB)、**16 个孤儿 APK(53.8MB)**、根级 `dist/`(30.6MB)、三个工具缓存(21MB)、`android/.kotlin`。清单存 `.backups/deleted-2026-09-12-cleanup-manifest.txt`；清理后 `releases/` 恰为 catalog 15 条 + catalog 本身 |
+| 4 | F1/F2 脱敏 + N2 | ✅ | `core/redaction.py` 新增 `mask_phone_number`/`PHONE_KEYS`/`scrub_metadata`；`relay.py:_serialize_message` 改用 `scrub_metadata`（响应侧单点收口）。124 passed |
+| 4.5 | J4 保留策略 | ✅ | `run_retention()` 补调 `_cleanup_forwarding_logs()`（此前只有定义、从无调用点，"保留 7 天"是空话）；新增回归测试，test_forwarding 10 passed |
+| 5 | D 级文档纠错 | ✅ | D5 改为 `get_otp_states`；D7 在 `DEPLOYMENT_AUDIT` 顶部加"时效说明"；**D6 复核为误报**（见下） |
+| 6 | D1 合并报告 | ✅ | 删除 `FULL_AUDIT_REPORT_2026-09-12.md`、`FULL_AUDIT_REPORT_2_2026-09-12.md`；`REMOTE_CONTROL_REFERENCE_COMPARISON.md` **整体并入** `PENDING_FEATURES_REPORT` 附录后删除。保留本文 + `DEPLOY_INCIDENT_RECOVERY` |
+| 6.5 | L2/L3 | ⏳ | 见下方"对 L3 建议的更正" |
+| 7 | 全量审查 | ⏳ | 待代码改动收敛后重跑三端 |
+| 8 | 重新打包 | ⏳ | 待第 7 步通过 |
+
+### 对本报告自身三处结论的更正
+
+1. **L3 的 6.5 建议（"删 `releases/deploy/`"）是错的，照做会破测**：
+   - `test_deploy.py:433-444` 断言**源仓库 catalog 必须含 `deploy` 条目**（最新 `version_code >= 20260901`、`signer_sha256 is None`、归档文件 size/sha256 匹配）；
+   - `test_deploy.py:447-456` 断言 catalog 每条记录对应文件都存在且哈希一致；
+   - `apply-update.sh:27-34` 反向校验"更新包内不得含 deploy 条目/目录"——说明 deploy 条目是**本地归档**，本就不随包发布（`SESSION_01A06BD1_HANDOFF.md:258` 亦记载"deploy 记录不会到达服务器，也没有界面消费它"）。
+   - **正确做法**：保留 `web/public/assets/releases/deploy/` 与 catalog 的 3 条记录，改为**在构建产物中剔除**（`vite build` 后删除 `dist/assets/releases/deploy`），关闭"直接部署 `web/dist` 即公开下载 95MB 源码包"的暴露面。
+2. **F1 的修法要比本报告写的更严**：报告原文建议"对 metadata 走 `redact_mapping`"，但 `phone_number` **既不在 `SENSITIVE_KEYS`、也不以 `_token/_secret/_code` 结尾**，单跑 `redact_mapping` **治不了本病**。实际实现新增了 `PHONE_KEYS` + `mask_phone_number` 并逐层下钻。
+3. **D6 是误报**：对 `PENDING_FEATURES_REPORT_2026-09-12.md` 全文 grep `无忧行` 只命中一处（第 101 行，第三节"已明确不做"），第二节并未列入，不存在自相矛盾。上一轮系误判。
+4. **B1 比原报告更宽**：被越过的非目标不止第 2 条，还有**第 1 条**（"不创建、删除或停用设备，不轮换或展示设备密钥"）——管理端 1.0.7 起已实现设备创建 / 凭据轮换 / 撤销 / 恢复 / 永久删除。两处已一并更正。
