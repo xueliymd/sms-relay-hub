@@ -134,3 +134,170 @@ docker compose -p deploy --env-file /root/relay/deploy/.env -f /root/relay/deplo
 - 禁止 `docker compose down -v`；禁止删除 `deploy_postgres_data` 或任何数据库卷。
 - 禁止用 `-p relay` 更新正式服务；正式栈固定 `deploy`。
 - `rm -rf` 只允许作用于解压目录（如 `/root/relay-update-source-*`），不允许作用于 `/root/relay`。
+
+---
+
+## 八、第二次更新失败（2026-09-12 21:43 UTC 13:43，包 `2026.09.12-platform-fixes`）
+
+### 8.1 发生了什么
+
+按第六节顺序执行新包，结果与 v3 那次**同一个症状**：
+
+```
+compose up -d → ✔ postgres Healthy 0.6s
+                ✘ app「dependency app failed to start」5.0s
+dependency failed to start: container deploy-app-1 is unhealthy
+update failed; restoring previous source, configuration and database
+```
+
+关键读数：compose **只等了 5 秒**就放弃 → 这不是 `start_period: 60s` + `retries: 6×10s` 的健康检查超时路径，
+而是**新容器在首启极短时间内就没能进入 healthy**（要么进程退出，要么立刻被判 unhealthy）。
+**新容器的首启日志没有被抓到**（`docker logs -f` 在 `^C` 时已经结束），这是这次最大的信息缺口。
+
+### 8.2 迁移确实成功提交了（重要）
+
+回滚里的 `pg_restore` 报错本身给出了证据：
+
+```
+constraint device_commands_device_id_fkey on table public.device_commands
+depends on index public.devices_pkey
+```
+
+`device_commands` 存在 → **`alembic upgrade head` 已经把 `20260910_0009` 和 `20260910_0010` 都跑完并提交**。
+所以失败点在迁移之后（uvicorn 启动阶段），不是迁移本身。
+
+### 8.3 回滚的数据库还原是「部分成功」
+
+`pg_restore --clean --if-exists` 掉了 5 个错，**全部集中在 `devices` 一张表**：
+
+- `cannot drop constraint devices_pkey … device_commands_device_id_fkey depends on it`
+- `cannot drop table public.devices … device_commands depends on it`
+- `relation "devices" already exists` / `COPY failed … duplicate key` / `multiple primary keys`
+
+含义：
+
+| 对象 | 结果 |
+| --- | --- |
+| `devices` | **DROP 失败 → 保留了更新前的实时数据**（未回退） |
+| 其余表（`messages`/`otps`/`api_clients`/`admin_accounts`/…） | **被 drop 后从 13:43:26 的 dump 重建 → 回退到备份时刻** |
+| `forwarding_rules` / `forwarding_logs` / `device_commands` / `messages.sender_body_digest` | 不在 dump 里 → `--clean` 不会删 → **残留至今** |
+| `alembic_version` | 被 dump 覆盖回 `20260902_0008` |
+
+**风险窗口**：13:43:26（备份）到回滚完成之间新产生的 `messages` / `otps` 行**可能已丢失**；
+`devices` 反而保留了实时数据。窗口只有约 2–3 分钟，需按 8.4 的 (d) 项核对缺口。
+
+### 8.4 处置顺序
+
+> 根因见 8.7（已确证）。所以现在的顺序是：**确认 → 清残留 → 打新包 → 更新**。
+> 可直接粘贴的命令单：`deploy/dist/DIAG-COMMANDS-2026.09.12-incident2.md`。
+
+**第 1 步｜2 秒确认根因（在服务器上，对着已解压的包跑）**
+
+```bash
+SRC=/root/relay-update-source-platform-fixes
+grep -n 'requests' $SRC/backend/pyproject.toml                 # 期望：无输出（没声明）
+grep -rn '^import requests' $SRC/backend/app/                  # 期望：services/forwarding.py:17
+```
+
+**第 2 步｜取证 + 对账（只读，摸清回滚到底影响了什么）**
+
+(a) `\dt`、`\d messages`、`alembic_version`、各表行数。
+(b) 把 13:43:26 的 dump 灌进一次性库 `relay_diag` 与生产库对账。
+(c) 查消息缺口：`select created_at, sender from messages order by created_at desc limit 10;`
+    看 13:43–13:47 之间是否有断档。
+
+**第 3 步｜清残留**（否则 0009 会撞 `relation already exists`）
+
+```bash
+docker exec deploy-postgres-1 psql -U sms_relay -d sms_relay -c "
+DROP TABLE IF EXISTS forwarding_logs;
+DROP TABLE IF EXISTS forwarding_rules;
+DROP TABLE IF EXISTS device_commands;
+ALTER TABLE messages DROP COLUMN IF EXISTS sender_body_digest;
+UPDATE alembic_version SET version_num = '20260902_0008';
+SELECT version_num FROM alembic_version;"
+```
+
+顺序必须是 logs → rules（`forwarding_logs.rule_id` 有指向 `forwarding_rules.id` 的 FK）。
+
+**第 4 步｜用修好依赖的新包重跑**（`*-r2`）。更新前先 `RELAY_UPDATE_DETECT_ONLY=1` 确认识别到 `deploy`，
+失败时务必在另一窗口 `docker logs -f deploy-app-1`。
+
+**第 5 步｜验收**：`alembic_version` 应为 `20260910_0010`，
+`/api/v1/releases/{android,root,manager}/history` 应返回 JSON（**注意没有裸的 `/api/v1/releases`**）。
+
+（原「隔离复现」仍可选：想眼见为实就跑一次 `relay_diag` 上的 `docker run`，
+会直接打印 `ModuleNotFoundError: No module named 'requests'`；但对修包已无必要。）
+
+### 8.5 已排除的猜测（省得重复查）
+
+- 不是 `entrypoint.sh` / `compose.yml` 没生效：`apply-update.sh:200-205` 先 `cp` 新 `compose.yml` 再整体覆盖 `deploy/`，`start_period: 60s` 在位。
+- 不是磁盘写入问题：`backend/app` 全量 grep 无 `mkdir`/`write_text`/`FileHandler`/`open(...)` 写操作。
+- 不是配置缺失：`deploy/compose.yml` 给的 `ADMIN_TOKEN`/`ADMIN_USERNAME`/`ADMIN_PASSWORD`/`DATABASE_URL`/`DATA_ENCRYPTION_KEY` 覆盖了 `Settings` 的全部必填项。
+- 不是 retetion 改动引入：`workers.retention_loop()` 自己 `except Exception` 吞异常，不会杀死进程；`_cleanup_forwarding_logs` 复用既有 session，没有嵌套 `store.lock`。
+
+### 8.6 测试为什么没拦住（真实覆盖缺口）
+
+`backend/tests/conftest.py:13` 把 `DATABASE_URL` 设成 **SQLite**，`store.configure(..., drop_existing=True)`
+走 **`Base.metadata.create_all`**；唯一跑迁移的 `test_migrations.py` **也是 SQLite**。
+→ **「迁移链产出的 PostgreSQL 模式」与「SQLAlchemy 模型」之间是否一致，本地 252 项测试完全不覆盖。**
+本机也没有 Docker（`docker --version` 无输出），testcontainers 类断言不可能在本沙箱生效。
+这一项应补：用 testcontainers Postgres 跑一次 `alembic upgrade head` 后做「模型 vs 库」列级比对。
+
+### 8.7 根因（已确证）：`backend/pyproject.toml` 漏声明 `requests`
+
+**不是迁移、不是配置、不是时序。是一行缺失的依赖声明。**
+
+```
+app/main.py:11  →  app/api/relay.py:25  →  app/services/forwarding.py:17
+                →  import requests  →  ModuleNotFoundError: No module named 'requests'
+```
+
+- `backend/app/services/forwarding.py:17`、`:148/:155/:162/:169/:176`、`:180/:184` 大量使用 `requests`
+  （企业微信/钉钉/飞书/Bark/webhook 五个推送渠道）。
+- `backend/pyproject.toml` 的 `[project] dependencies` 里**没有 `requests`**。
+- 容器只执行 `pip install --no-cache-dir .`，即**只装声明的运行时依赖** → 容器里根本没有 `requests`。
+- 于是 `uvicorn app.main:app` 在**导入期**就抛 `ModuleNotFoundError`，进程几秒内退出；
+  compose 对已退出的依赖立即放弃 → `dependency failed to start: container deploy-app-1 is unhealthy`（5.0s）。
+- **v3 那次是同一个病**（v3 也带 `forwarding.py`），症状完全一致。
+
+**为什么本地 252 项全绿**：`requests` 恰好是 dev 依赖链的传递依赖 ——
+`pip show` 级别的证据：`requests` 被 `docker`（`testcontainers` 的依赖）和 `pytest` 拉进 venv
+（`.tmp/dep_audit.txt` 的「requests 的来路」一节）。本地 venv 有、容器没有 → 测试天然测不到。
+
+**本地复现证据**（`.tmp/prove_missing_requests.py`）：用一个 meta_path finder 屏蔽 `requests`，
+按容器方式 `import app.main`，堆栈精确落在
+
+```
+File "backend/app/main.py", line 11, in <module>
+File "backend/app/api/relay.py", line 25, in <module>
+File "backend/app/services/forwarding.py", line 17, in <module>
+    import requests
+ModuleNotFoundError: No module named 'requests'
+```
+
+**修复**
+
+1. `backend/pyproject.toml` 的 `[project] dependencies` 补 `"requests>=2.32,<3.0"`（含说明注释）。
+2. 新增 `backend/tests/test_dependencies.py`：遍历 `backend/app/**/*.py` 的 AST，
+   断言每个第三方顶层 import 都能在 pyproject 的 `dependencies` 里找到
+   （仅 `argon2→argon2-cffi`、`paho→paho-mqtt` 两个改名别名，以及 `pydantic` 这个传递依赖入白名单）。
+   **做过变异检查**：临时摘掉 `requests` 声明 → 该测试 2 项全红且报出行号；还原后字节一致。
+3. 修复后**已重新打包**（变更落在镜像构建路径上，必须重打）：
+
+   | 项 | 值 |
+   | --- | --- |
+   | 包名 | `deploy/dist/sms-relay-hub-update-2026.09.12-platform-fixes-r2.zip` |
+   | 字节数 | 33,069,313 |
+   | sha256 | `0a87055ee08ffbad0824220501a7a85a4c756bacd4babf7a50e9e122fd86e354` |
+   | 条目数 | 132（无反斜杠） |
+   | 成品校验 | **34 项全绿**（原 30 项 + 新增「包内 pyproject 已声明 requests」「包内 `backend/app` 第三方 import 全部已声明」） |
+
+   回归：后端全量 **254 passed**（原 252 + 新增 2 项依赖守卫，413.68s）。
+   **第一版 `-platform-fixes.zip` 作废，不要复用。**
+
+4. `deploy/dist/UPDATE-COMMANDS-2026.09.12-platform-fixes.md` 已同步到 r2 的指纹，
+   并在自检步骤里加了 `grep -c '"requests' $SRC/backend/pyproject.toml`（期望 1）作为防拿错包的闸门。
+
+**顺带记录一个同类隐患**：`backend/app/core/config.py:26` 的 `app_port` 默认值仍是 `8000`
+（被禁止的历史遗留值）。运行时被 compose 的 `APP_PORT=39200` 覆盖所以没暴露，但默认值本身是错的。

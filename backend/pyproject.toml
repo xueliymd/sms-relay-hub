@@ -14,6 +14,10 @@ dependencies = [
     "cryptography>=44,<46",
     "argon2-cffi>=23.1,<26",
     "alembic>=1.15,<2.0",
+    # app/services/forwarding.py 的推送渠道走 requests.post；本地 venv 因为它只是
+    # testcontainers→docker 的传递依赖而恰好存在，容器只装本列表 → 必须显式声明，
+    # 否则 uvicorn 导入 app.main 时即 ModuleNotFoundError，进程秒退、健康检查永远不通过。
+    "requests>=2.32,<3.0",
     "psycopg[binary]>=3.2,<4.0",
     "sqlalchemy>=2.0,<3.0",
     "paho-mqtt>=2.1,<3.0",
