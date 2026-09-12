@@ -1,0 +1,506 @@
+#!/system/bin/sh
+
+set -u
+umask 077
+
+DEFAULT_STATE_DIR=${SMS_RELAY_STATE_DIR:-/data/adb/sms-relay}
+DEFAULT_CONFIG=$DEFAULT_STATE_DIR/config.json
+TMP_PARENT=${SMS_RELAY_TMP_PARENT:-/data/local/tmp}
+CONFIG_PATH=$DEFAULT_CONFIG
+BODY_PATH=-
+IDEMPOTENCY_KEY=
+CHECK_ONLY=0
+TEMP_DIR=
+BODY_SNAPSHOT=
+RUNTIME=${SMS_RELAY_RUNTIME:-/system/bin/sms-relay-runtime}
+RAW_BODY_MAX_BYTES=16384
+SNAPSHOT_READ_BYTES=$((RAW_BODY_MAX_BYTES + 1))
+JSON_MAX_DEPTH=32
+MQTT_TOPIC_MAX_BYTES=512
+
+fail() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+fail_body() {
+    printf '%s\n' "$1"
+    exit 1
+}
+
+cleanup() {
+    if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+        rm -rf "$TEMP_DIR" >/dev/null 2>&1 || true
+    fi
+}
+
+# Signals exit and are cleaned only by the single EXIT trap.
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+require_command() {
+    command -v "$1" >/dev/null 2>&1 || fail "missing_dependency"
+}
+
+trim_line() {
+    printf '%s' "$1" | sed 's/\r$//; s/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+# Configuration is intentionally narrower than general JSON: one top-level
+# key per line, no escapes/nesting/arrays, exact scalar tokens, no duplicates,
+# and no unknown fields. SMS bodies use a separate parser below.
+parse_config() {
+    config_open=0; config_closed=0; config_fields=0; config_previous_comma=0
+    seen_schema_version=0; seen_enabled=0; seen_base_url=0; seen_allow_insecure_local_http=0; seen_transport_mode=0; seen_fallback_to_http=0; seen_device_id=0
+    seen_hmac_secret=0; seen_source=0; seen_android_user_id=0; seen_initial_sync=0
+    seen_poll_interval=0; seen_max_backoff=0; seen_watcher_idle=0; seen_sms_database_path=0
+    seen_mqtt_broker_url=0; seen_mqtt_topic=0; seen_mqtt_username=0; seen_mqtt_password=0
+    CONFIG_SCHEMA_VERSION=; CONFIG_ENABLED=; BASE_URL=; ALLOW_INSECURE_LOCAL_HTTP=false; TRANSPORT_MODE=http; FALLBACK_TO_HTTP=true; DEVICE_ID=; HMAC_SECRET=
+    MQTT_BROKER_URL=; MQTT_TOPIC=; MQTT_USERNAME=; MQTT_PASSWORD=; SOURCE=; ANDROID_USER_ID=; INITIAL_SYNC_MODE=; POLL_INTERVAL=; MAX_BACKOFF=
+
+    raw_line=
+    while IFS= read -r raw_line || [ -n "$raw_line" ]; do
+        line=$(trim_line "$raw_line")
+        [ -n "$line" ] || fail "config_invalid"
+        if [ "$config_open" = "0" ]; then
+            [ "$line" = "{" ] || fail "config_invalid"
+            config_open=1; continue
+        fi
+        [ "$config_closed" = "0" ] || fail "config_invalid"
+        if [ "$line" = "}" ]; then
+            [ "$config_fields" -gt 0 ] && [ "$config_previous_comma" = "0" ] || fail "config_invalid"
+            config_closed=1; continue
+        fi
+        if [ "$config_fields" -gt 0 ] && [ "$config_previous_comma" != "1" ]; then
+            fail "config_invalid"
+        fi
+        has_comma=0; token=$line
+        case "$token" in *,) has_comma=1; token=${token%,} ;; esac
+        key=; value=; value_type=
+        key=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*"\([^"\\]*\)"[[:space:]]*$/\1/p')
+        if [ -n "$key" ]; then
+            value=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*"\([^"\\]*\)"[[:space:]]*$/\2/p')
+            value_type=string
+        else
+            key=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*true[[:space:]]*$/\1/p')
+            if [ -n "$key" ]; then
+                value=true; value_type=boolean
+            else
+                key=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*false[[:space:]]*$/\1/p')
+                if [ -n "$key" ]; then
+                    value=false; value_type=boolean
+                else
+                    key=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*0[[:space:]]*$/\1/p')
+                    if [ -n "$key" ]; then
+                        value=0; value_type=integer
+                    else
+                        key=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*[1-9][0-9]*[[:space:]]*$/\1/p')
+                        if [ -n "$key" ]; then
+                            value=$(printf '%s' "$token" | sed -n 's/^[[:space:]]*"\([A-Za-z_][A-Za-z0-9_]*\)"[[:space:]]*:[[:space:]]*\([1-9][0-9]*\)[[:space:]]*$/\2/p'); value_type=integer
+                        fi
+                    fi
+                fi
+            fi
+        fi
+        [ -n "$key" ] || fail "config_invalid"
+        case "$key" in
+            schema_version) [ "$value_type" = integer ] && [ "$seen_schema_version" = 0 ] || fail "config_invalid"; seen_schema_version=1; CONFIG_SCHEMA_VERSION=$value ;;
+            enabled) [ "$value_type" = boolean ] && [ "$seen_enabled" = 0 ] || fail "config_invalid"; seen_enabled=1; CONFIG_ENABLED=$value ;;
+            base_url) [ "$value_type" = string ] && [ "$seen_base_url" = 0 ] || fail "config_invalid"; seen_base_url=1; BASE_URL=$value ;;
+            allow_insecure_local_http) [ "$value_type" = boolean ] && [ "$seen_allow_insecure_local_http" = 0 ] || fail "config_invalid"; seen_allow_insecure_local_http=1; ALLOW_INSECURE_LOCAL_HTTP=$value ;;
+            transport_mode) [ "$value_type" = string ] && [ "$seen_transport_mode" = 0 ] || fail "config_invalid"; seen_transport_mode=1; TRANSPORT_MODE=$value ;;
+            fallback_to_http) [ "$value_type" = boolean ] && [ "$seen_fallback_to_http" = 0 ] || fail "config_invalid"; seen_fallback_to_http=1; FALLBACK_TO_HTTP=$value ;;
+            mqtt_broker_url) [ "$value_type" = string ] && [ "$seen_mqtt_broker_url" = 0 ] || fail "config_invalid"; seen_mqtt_broker_url=1; MQTT_BROKER_URL=$value ;;
+            mqtt_topic) [ "$value_type" = string ] && [ "$seen_mqtt_topic" = 0 ] || fail "config_invalid"; seen_mqtt_topic=1; MQTT_TOPIC=$value ;;
+            mqtt_username) [ "$value_type" = string ] && [ "$seen_mqtt_username" = 0 ] || fail "config_invalid"; seen_mqtt_username=1; MQTT_USERNAME=$value ;;
+            mqtt_password) [ "$value_type" = string ] && [ "$seen_mqtt_password" = 0 ] || fail "config_invalid"; seen_mqtt_password=1; MQTT_PASSWORD=$value ;;
+            device_id) [ "$value_type" = string ] && [ "$seen_device_id" = 0 ] || fail "config_invalid"; seen_device_id=1; DEVICE_ID=$value ;;
+            hmac_secret) [ "$value_type" = string ] && [ "$seen_hmac_secret" = 0 ] || fail "config_invalid"; seen_hmac_secret=1; HMAC_SECRET=$value ;;
+            source) [ "$value_type" = string ] && [ "$seen_source" = 0 ] || fail "config_invalid"; seen_source=1; SOURCE=$value ;;
+            android_user_id) [ "$value_type" = integer ] && [ "$seen_android_user_id" = 0 ] || fail "config_invalid"; seen_android_user_id=1; ANDROID_USER_ID=$value ;;
+            initial_sync_mode) [ "$value_type" = string ] && [ "$seen_initial_sync" = 0 ] || fail "config_invalid"; seen_initial_sync=1; INITIAL_SYNC_MODE=$value ;;
+            poll_interval_seconds) [ "$value_type" = integer ] && [ "$seen_poll_interval" = 0 ] || fail "config_invalid"; seen_poll_interval=1; POLL_INTERVAL=$value ;;
+            max_backoff_seconds) [ "$value_type" = integer ] && [ "$seen_max_backoff" = 0 ] || fail "config_invalid"; seen_max_backoff=1; MAX_BACKOFF=$value ;;
+            watcher_idle_seconds) [ "$value_type" = integer ] && [ "$seen_watcher_idle" = 0 ] || fail "config_invalid"; seen_watcher_idle=1 ;;
+            sms_database_path) [ "$value_type" = string ] && [ "$seen_sms_database_path" = 0 ] || fail "config_invalid"; seen_sms_database_path=1 ;;
+            *) fail "config_invalid" ;;
+        esac
+        config_fields=$((config_fields + 1)); config_previous_comma=$has_comma
+    done < "$CONFIG_PATH"
+    [ "$config_open" = 1 ] && [ "$config_closed" = 1 ] || fail "config_invalid"
+    [ "$seen_schema_version" = 1 ] && [ "$seen_enabled" = 1 ] && [ "$seen_base_url" = 1 ] || fail "config_invalid"
+    [ "$seen_device_id" = 1 ] && [ "$seen_hmac_secret" = 1 ] && [ "$seen_source" = 1 ] || fail "config_invalid"
+    [ "$seen_android_user_id" = 1 ] && [ "$seen_initial_sync" = 1 ] || fail "config_invalid"
+    [ "$seen_poll_interval" = 1 ] && [ "$seen_max_backoff" = 1 ] || fail "config_invalid"
+    [ "$CONFIG_SCHEMA_VERSION" = 2 ] || fail "config_invalid"
+    case "$TRANSPORT_MODE" in
+        http|ws) ;;
+        mqtt) [ -n "$MQTT_BROKER_URL" ] || fail "config_invalid"
+            case "$MQTT_BROKER_URL" in
+                mqtt://*|mqtts://*)
+                    printf '%s' "$MQTT_BROKER_URL" | grep -Eq '^(mqtt|mqtts)://[^@/[:space:]?#]+$|^(mqtt|mqtts)://[^@/[:space:]?#]+/$' || fail "config_invalid"
+                    ;;
+                ws://*|wss://*)
+                    printf '%s' "$MQTT_BROKER_URL" | grep -Eq '^(ws|wss)://[^@/[:space:]?#]+$|^(ws|wss)://[^@/[:space:]?#]+/[^[:space:]?#]*$' || fail "config_invalid"
+                    ;;
+                *) fail "config_invalid" ;;
+            esac
+            if [ -n "$MQTT_TOPIC" ]; then
+                printf '%s' "$MQTT_TOPIC" | grep -Eq '^[^+#[:space:]]+$' || fail "config_invalid"
+                [ "$MQTT_TOPIC" = 'relay/v1/devices/{device_id}/messages' ] || [ "$MQTT_TOPIC" = "relay/v1/devices/$DEVICE_ID/messages" ] || fail "config_invalid"
+                mqtt_topic_bytes=$(printf '%s' "$MQTT_TOPIC" | wc -c | tr -d '[:space:]')
+                printf '%s' "$mqtt_topic_bytes" | grep -Eq '^[0-9]+$' || fail "config_invalid"
+                [ "$mqtt_topic_bytes" -le "$MQTT_TOPIC_MAX_BYTES" ] || fail "config_invalid"
+            fi
+            ;;
+        *) fail "config_invalid" ;;
+    esac
+}
+
+load_config() {
+    [ -f "$CONFIG_PATH" ] || fail "config_missing"
+    parse_config
+    [ "$CONFIG_ENABLED" = "true" ] || fail "config_disabled"
+
+    case "$BASE_URL" in
+        https://*) ;;
+        http://*) [ "$ALLOW_INSECURE_LOCAL_HTTP" = "true" ] || fail "config_invalid" ;;
+        *) fail "config_invalid" ;;
+    esac
+    case "$BASE_URL" in
+        *'?'*|*'#'*) fail "config_invalid" ;;
+    esac
+    printf '%s' "$BASE_URL" | grep -Eq '^https?://[^/[:space:]]+(/[^[:space:]]*)?$' || fail "config_invalid"
+    printf '%s' "$DEVICE_ID" | grep -Eq '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$' || fail "config_invalid"
+    [ "$SOURCE" = "root_module" ] || fail "config_invalid"
+    [ "$ANDROID_USER_ID" -ge 0 ] || fail "config_invalid"
+    [ "$INITIAL_SYNC_MODE" = "new_only" ] || fail "config_invalid"
+    [ "$POLL_INTERVAL" -ge 1 ] && [ "$POLL_INTERVAL" -le 3600 ] || fail "config_invalid"
+    [ "$MAX_BACKOFF" -ge 1 ] && [ "$MAX_BACKOFF" -le 3600 ] || fail "config_invalid"
+    [ -x "$RUNTIME" ] || fail "runtime_unavailable"
+    if ! "$RUNTIME" check-config --config "$CONFIG_PATH" >/dev/null 2>&1; then
+        fail "config_invalid"
+    fi
+}
+
+validate_body_json() {
+    [ ${#IDEMPOTENCY_KEY} -le 200 ] || fail_body "local_body_invalid"
+    printf '%s' "$IDEMPOTENCY_KEY" | grep -Eq '^[A-Za-z0-9._:-]+$' || fail_body "local_body_invalid"
+
+    # Parse the complete document without rewriting BODY_PATH. The recursive
+    # parser accepts JSON values generally, requires the root to be an object,
+    # and captures only unique, unescaped top-level contract strings. Nested
+    # metadata cannot satisfy the required fields, while the original bytes
+    # remain untouched for SHA-256 and curl --data-binary.
+    body_validation=$(awk -v expected_id="$IDEMPOTENCY_KEY" -v max_depth="$JSON_MAX_DEPTH" '
+        function skip_ws(    c) {
+            while (pos <= text_len) {
+                c = substr(text, pos, 1)
+                if (c != " " && c != "\t" && c != "\r" && c != "\n") break
+                pos++
+            }
+        }
+        function is_hex4(value,    i, c) {
+            if (length(value) != 4) return 0
+            for (i = 1; i <= 4; i++) {
+                c = substr(value, i, 1)
+                if (c !~ /^[0-9A-Fa-f]$/) return 0
+            }
+            return 1
+        }
+        function depth_within_limit(    i, c, depth, in_string, escaped) {
+            depth = 0
+            in_string = 0
+            escaped = 0
+            for (i = 1; i <= text_len; i++) {
+                c = substr(text, i, 1)
+                if (in_string) {
+                    if (escaped) {
+                        escaped = 0
+                    } else if (c == "\\") {
+                        escaped = 1
+                    } else if (c == "\"") {
+                        in_string = 0
+                    }
+                    continue
+                }
+                if (c == "\"") {
+                    in_string = 1
+                } else if (c == "{" || c == "[") {
+                    depth++
+                    if (depth > max_depth) return 0
+                } else if (c == "}" || c == "]") {
+                    depth--
+                    if (depth < 0) return 0
+                }
+            }
+            return depth == 0 && !in_string && !escaped
+        }
+        function parse_string(    c, esc, hex) {
+            if (substr(text, pos, 1) != "\"") return 0
+            pos++
+            parsed_string = ""
+            string_had_escape = 0
+            while (pos <= text_len) {
+                c = substr(text, pos, 1)
+                if (c == "\"") {
+                    pos++
+                    return 1
+                }
+                if (c == "\\") {
+                    string_had_escape = 1
+                    pos++
+                    if (pos > text_len) return 0
+                    esc = substr(text, pos, 1)
+                    if (esc == "u") {
+                        hex = substr(text, pos + 1, 4)
+                        if (!is_hex4(hex)) return 0
+                        pos += 5
+                        continue
+                    }
+                    if (esc !~ /^["\\\/bfnrt]$/) return 0
+                    pos++
+                    continue
+                }
+                if (c ~ /[[:cntrl:]]/) return 0
+                parsed_string = parsed_string c
+                pos++
+            }
+            return 0
+        }
+        function parse_number(    c) {
+            if (substr(text, pos, 1) == "-") pos++
+            c = substr(text, pos, 1)
+            if (c == "0") {
+                pos++
+                if (substr(text, pos, 1) ~ /^[0-9]$/) return 0
+            } else {
+                if (c !~ /^[1-9]$/) return 0
+                while (substr(text, pos, 1) ~ /^[0-9]$/) pos++
+            }
+            if (substr(text, pos, 1) == ".") {
+                pos++
+                if (substr(text, pos, 1) !~ /^[0-9]$/) return 0
+                while (substr(text, pos, 1) ~ /^[0-9]$/) pos++
+            }
+            c = substr(text, pos, 1)
+            if (c == "e" || c == "E") {
+                pos++
+                c = substr(text, pos, 1)
+                if (c == "+" || c == "-") pos++
+                if (substr(text, pos, 1) !~ /^[0-9]$/) return 0
+                while (substr(text, pos, 1) ~ /^[0-9]$/) pos++
+            }
+            return 1
+        }
+        function parse_array(depth,    c) {
+            if (depth > max_depth) return 0
+            if (substr(text, pos, 1) != "[") return 0
+            pos++
+            skip_ws()
+            if (substr(text, pos, 1) == "]") { pos++; return 1 }
+            while (1) {
+                if (!parse_value(depth + 1)) return 0
+                skip_ws()
+                c = substr(text, pos, 1)
+                if (c == "]") { pos++; return 1 }
+                if (c != ",") return 0
+                pos++
+                skip_ws()
+            }
+        }
+        function parse_object(is_root, depth,    c, key, key_escaped) {
+            if (depth > max_depth) return 0
+            if (substr(text, pos, 1) != "{") return 0
+            pos++
+            skip_ws()
+            if (substr(text, pos, 1) == "}") { pos++; return 1 }
+            while (1) {
+                if (!parse_string()) return 0
+                key = parsed_string
+                key_escaped = string_had_escape
+                if (is_root && key_escaped) return 0
+                skip_ws()
+                if (substr(text, pos, 1) != ":") return 0
+                pos++
+                skip_ws()
+                if (is_root && (key == "source" || key == "client_message_id")) {
+                    if (key == "source") {
+                        source_count++
+                        if (source_count != 1) return 0
+                    } else {
+                        id_count++
+                        if (id_count != 1) return 0
+                    }
+                    if (!parse_string() || string_had_escape) return 0
+                    if (key == "source") source_value = parsed_string
+                    else id_value = parsed_string
+                } else if (!parse_value(depth + 1)) {
+                    return 0
+                }
+                skip_ws()
+                c = substr(text, pos, 1)
+                if (c == "}") { pos++; return 1 }
+                if (c != ",") return 0
+                pos++
+                skip_ws()
+            }
+        }
+        function parse_value(depth,    c) {
+            skip_ws()
+            c = substr(text, pos, 1)
+            if (c == "\"") return parse_string()
+            if (c == "{") return parse_object(0, depth)
+            if (c == "[") return parse_array(depth)
+            if (substr(text, pos, 4) == "true") { pos += 4; return 1 }
+            if (substr(text, pos, 5) == "false") { pos += 5; return 1 }
+            if (substr(text, pos, 4) == "null") { pos += 4; return 1 }
+            return parse_number()
+        }
+        { text = text $0 "\n" }
+        END {
+            text_len = length(text)
+            if (!depth_within_limit()) exit 2
+            pos = 1
+            skip_ws()
+            if (!parse_object(1, 1)) exit 2
+            skip_ws()
+            if (pos <= text_len) exit 2
+            if (source_count != 1 || id_count != 1) exit 2
+            if (source_value != "root_module" || id_value != expected_id) exit 2
+            print "valid"
+        }
+    ' "$BODY_PATH" 2>/dev/null) || fail_body "local_body_invalid"
+    [ "$body_validation" = "valid" ] || fail_body "local_body_invalid"
+}
+
+runtime_probe() {
+    probe_body=$TEMP_DIR/probe.bin
+    printf '%s' probe > "$probe_body" || fail "runtime_probe_failed"
+    probe_sha=$("$RUNTIME" sha256 --body "$probe_body" 2>/dev/null)
+    printf '%s' "$probe_sha" | grep -Eq '^[0-9a-fA-F]{64}$' || fail "runtime_probe_failed"
+    probe_rand=$("$RUNTIME" nonce 2>/dev/null)
+    printf '%s' "$probe_rand" | grep -Eq '^[A-Za-z0-9_-]{32,}$' || fail "runtime_probe_failed"
+    probe_hmac=$("$RUNTIME" hmac --config "$CONFIG_PATH" --timestamp 1 --nonce runtime-probe --body "$probe_body" 2>/dev/null)
+    printf '%s' "$probe_hmac" | grep -Eq '^[A-Za-z0-9_-]+$' || fail "runtime_probe_failed"
+    # -q must be the first curl option so curlrc cannot inject -k or other
+    # transport-changing flags into the real request. Help inspection is
+    # offline and confirms every long-form flag used by the upload path.
+    curl_help=$(curl -q --help all 2>/dev/null) || fail "runtime_probe_failed"
+    for curl_flag in --silent --show-error --output --write-out --connect-timeout --max-time --request --header --data-binary; do
+        printf '%s' "$curl_help" | grep -F -e "$curl_flag" >/dev/null 2>&1 || fail "runtime_probe_failed"
+    done
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --config)
+            [ $# -ge 2 ] || fail "usage_error"
+            CONFIG_PATH=$2
+            shift 2
+            ;;
+        --idempotency-key)
+            [ $# -ge 2 ] || fail "usage_error"
+            IDEMPOTENCY_KEY=$2
+            shift 2
+            ;;
+        --check-config)
+            CHECK_ONLY=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*) fail "usage_error" ;;
+        *)
+            BODY_PATH=$1
+            shift
+            break
+            ;;
+    esac
+done
+[ $# -eq 0 ] || fail "usage_error"
+
+require_command curl
+require_command "$RUNTIME"
+require_command awk
+for dependency in grep sed tr wc mktemp od dd date rm; do
+    require_command "$dependency"
+done
+
+TEMP_DIR=$(mktemp -d "$TMP_PARENT/sms-relay-upload.XXXXXX" 2>/dev/null) || fail "temporary_storage_unavailable"
+load_config
+
+if [ "$CHECK_ONLY" = "1" ]; then
+    runtime_probe
+    printf '%s\n' "ready"
+    exit 0
+fi
+
+[ -n "$IDEMPOTENCY_KEY" ] || fail "usage_error"
+BODY_SNAPSHOT=$TEMP_DIR/body.json
+if [ "$BODY_PATH" = "-" ]; then
+    if ! dd of="$BODY_SNAPSHOT" bs=1 count="$SNAPSHOT_READ_BYTES" 2>/dev/null; then
+        fail_body "local_body_read_failed"
+    fi
+else
+    [ -f "$BODY_PATH" ] || fail_body "local_body_read_failed"
+    if ! dd if="$BODY_PATH" of="$BODY_SNAPSHOT" bs="$SNAPSHOT_READ_BYTES" count=1 2>/dev/null; then
+        fail_body "local_body_read_failed"
+    fi
+fi
+snapshot_size=$(wc -c < "$BODY_SNAPSHOT" | tr -d '[:space:]')
+printf '%s' "$snapshot_size" | grep -Eq '^[0-9]+$' || fail_body "local_body_read_failed"
+[ "$snapshot_size" -ge 1 ] || fail_body "local_body_invalid"
+[ "$snapshot_size" -le "$RAW_BODY_MAX_BYTES" ] || fail_body "local_body_too_large"
+BODY_PATH=$BODY_SNAPSHOT
+validate_body_json
+
+timestamp=$(date +%s 2>/dev/null) || fail "clock_unavailable"
+printf '%s' "$timestamp" | grep -Eq '^[0-9]+$' || fail "clock_unavailable"
+nonce=$("$RUNTIME" nonce 2>/dev/null) || fail "nonce_unavailable"
+printf '%s' "$nonce" | grep -Eq '^[A-Za-z0-9_-]{32,}$' || fail "nonce_unavailable"
+
+signature=$("$RUNTIME" hmac --config "$CONFIG_PATH" --timestamp "$timestamp" --nonce "$nonce" --body "$BODY_PATH" 2>/dev/null) || fail "signature_failed"
+printf '%s' "$signature" | grep -Eq '^[A-Za-z0-9_-]+$' || fail "signature_failed"
+
+if [ "$TRANSPORT_MODE" = "ws" ] || [ "$TRANSPORT_MODE" = "mqtt" ]; then
+    transport_status=$(
+        "$RUNTIME" transport-upload \
+            --mode "$TRANSPORT_MODE" \
+            --config "$CONFIG_PATH" \
+            --timestamp "$timestamp" \
+            --nonce "$nonce" \
+            --idempotency-key "$IDEMPOTENCY_KEY" \
+            --body "$BODY_PATH" 2>/dev/null
+    ) || transport_status=
+    if printf '%s' "$transport_status" | grep -Eq '^2[0-9]{2}$'; then
+        printf '%s\n' "$transport_status"
+        exit 0
+    fi
+    [ "$FALLBACK_TO_HTTP" = "true" ] || fail "upload_failed"
+fi
+
+endpoint=${BASE_URL%/}/api/v1/ingest/messages
+status=$(curl -q -sS -o /dev/null -w '%{http_code}' \
+    --connect-timeout 5 \
+    --max-time 15 \
+    --request POST \
+    --header 'Content-Type: application/json' \
+    --header "X-Device-Id: $DEVICE_ID" \
+    --header "X-Timestamp: $timestamp" \
+    --header "X-Nonce: $nonce" \
+    --header "X-Signature: $signature" \
+    --header "X-Idempotency-Key: $IDEMPOTENCY_KEY" \
+    --data-binary "@$BODY_PATH" \
+    "$endpoint" 2>/dev/null) || fail "upload_failed"
+
+printf '%s' "$status" | grep -Eq '^[0-9]{3}$' || fail "upload_failed"
+printf '%s\n' "$status"
+case "$status" in
+    2??) exit 0 ;;
+    *) exit 1 ;;
+esac

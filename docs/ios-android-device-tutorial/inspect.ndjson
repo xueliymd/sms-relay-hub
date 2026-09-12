@@ -1,0 +1,282 @@
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"SMS RELAY HUB","textShapes":7}
+{"kind":"textbox","id":"sh/wn6dc7eh","slide":1,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,76,500,28]}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"text":"Android Root + iPhone\n短信接入操作教程","textPreview":"Android Root + iPhone | 短信接入操作教程","textChars":30,"textLines":2,"bbox":[72,150,690,150]}
+{"kind":"textbox","id":"sh/k3yl0zql","slide":1,"text":"第一版部署 · 设备注册 · 配置参数 · 真机验收","textPreview":"第一版部署 · 设备注册 · 配置参数 · 真机验收","textChars":26,"textLines":1,"bbox":[76,342,650,34]}
+{"kind":"shape","id":"sh/7qp4be9c","slide":1,"bbox":[820,140,330,330]}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[866,184,240,88]}
+{"kind":"shape","id":"sh/ts7md4r2","slide":1,"bbox":[866,292,214,3]}
+{"kind":"textbox","id":"sh/sryl4zqx","slide":1,"text":"先完成设备接入\n再验证新短信","textPreview":"先完成设备接入 | 再验证新短信","textChars":14,"textLines":2,"bbox":[866,324,230,80]}
+{"kind":"textbox","id":"sh/fu94fe98","slide":1,"text":"面向设备配置人员 · 不包含 APK/app 开发内容","textPreview":"面向设备配置人员 · 不包含 APK/app 开发内容","textChars":27,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/utg3698n","slide":1,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n目标：让操作人员完成 Android Root 或 iPhone 快捷指令的第一版接入，并知道如何验证结果。\nApple Shortcuts 的具体界面名称可能随 iOS 版本变化，请以真机显示为准。"}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"SMS RELAY HUB","textShapes":19}
+{"kind":"textbox","id":"sh/65kfmpor","slide":2,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"text":"第一版先交付什么，暂时不做什么","textPreview":"第一版先交付什么，暂时不做什么","textChars":15,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/ozy1ofad","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/b29kza94","slide":2,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"text":"这次交付的是可部署的中转平台和两种设备接入教程。","textPreview":"这次交付的是可部署的中转平台和两种设备接入教程。","textChars":24,"textLines":1,"bbox":[72,178,900,32]}
+{"kind":"shape","id":"sh/x4r21kru","slide":2,"bbox":[72,240,500,108]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"text":"已包含","textPreview":"已包含","textChars":3,"textLines":1,"bbox":[88,253,468,24]}
+{"kind":"textbox","id":"sh/r65knqtk","slide":2,"text":"Docker 部署、PostgreSQL 新库、后台设备注册、Android Root 模块、iPhone 快捷指令契约。","textPreview":"Docker 部署、PostgreSQL 新库、后台设备注册、Android Root 模块、iPhone 快捷指令契约。","textChars":61,"textLines":1,"bbox":[88,284,468,50]}
+{"kind":"shape","id":"sh/q5wjelsz","slide":2,"bbox":[620,240,500,108]}
+{"kind":"textbox","id":"sh/ove9o7yd","slide":2,"text":"明确边界","textPreview":"明确边界","textChars":4,"textLines":1,"bbox":[636,253,468,24]}
+{"kind":"textbox","id":"sh/9wnqhczy","slide":2,"text":"APK/app 开发暂缓；服务器首次部署不会读取当前工作区的本机测试数据库。","textPreview":"APK/app 开发暂缓；服务器首次部署不会读取当前工作区的本机测试数据库。","textChars":38,"textLines":1,"bbox":[636,284,468,50]}
+{"kind":"textbox","id":"sh/mtwrmxg7","slide":2,"text":"生产验收顺序","textPreview":"生产验收顺序","textChars":6,"textLines":1,"bbox":[72,408,300,28]}
+{"kind":"textbox","id":"sh/nu58f2hs","slide":2,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[72,452,36,36]}
+{"kind":"textbox","id":"sh/wjy9sry9","slide":2,"text":"部署全新数据库并检查 health","textPreview":"部署全新数据库并检查 health","textChars":17,"textLines":1,"bbox":[116,450,890,42]}
+{"kind":"textbox","id":"sh/xk7qlczu","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[72,500,36,36]}
+{"kind":"textbox","id":"sh/ahwrqhgj","slide":2,"text":"后台创建设备并保存一次性凭据","textPreview":"后台创建设备并保存一次性凭据","textChars":14,"textLines":1,"bbox":[116,498,890,42]}
+{"kind":"textbox","id":"sh/bip8jmho","slide":2,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[72,548,36,36]}
+{"kind":"textbox","id":"sh/cnupgny5","slide":2,"text":"安装客户端后只发送一条新的测试短信","textPreview":"安装客户端后只发送一条新的测试短信","textChars":17,"textLines":1,"bbox":[116,546,890,42]}
+{"kind":"textbox","id":"sh/do3q9szq","slide":2,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[72,596,36,36]}
+{"kind":"textbox","id":"sh/t8byxkn2","slide":2,"text":"在消息页确认 201/200 结果和设备活动时间","textPreview":"在消息页确认 201/200 结果和设备活动时间","textChars":24,"textLines":1,"bbox":[116,594,890,42]}
+{"kind":"textbox","id":"sh/s72xofmh","slide":2,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/76twva5c","slide":2,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"SMS RELAY HUB","textShapes":17}
+{"kind":"textbox","id":"sh/re9g7yxo","slide":3,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"text":"后台先创建设备，再把凭据交给客户端","textPreview":"后台先创建设备，再把凭据交给客户端","textChars":17,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/298ryl4v","slide":3,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"text":"设备页 -> 添加设备","textPreview":"设备页 -> 添加设备","textChars":11,"textLines":1,"bbox":[72,180,360,30]}
+{"kind":"textbox","id":"sh/obq90bml","slide":3,"text":"Android Root","textPreview":"Android Root","textChars":12,"textLines":1,"bbox":[72,242,300,38]}
+{"kind":"textbox","id":"sh/pcjqtg36","slide":3,"text":"鉴权：hmac","textPreview":"鉴权：hmac","textChars":7,"textLines":1,"bbox":[72,290,300,30]}
+{"kind":"textbox","id":"sh/m5cra54z","slide":3,"text":"iPhone 快捷指令","textPreview":"iPhone 快捷指令","textChars":11,"textLines":1,"bbox":[72,382,340,38]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"text":"鉴权：bearer","textPreview":"鉴权：bearer","textChars":9,"textLines":1,"bbox":[72,430,300,30]}
+{"kind":"shape","id":"sh/n2l4fq98","slide":3,"bbox":[450,196,2,320]}
+{"kind":"textbox","id":"sh/m1c3mlsn","slide":3,"text":"创建设备后复制配置参数","textPreview":"创建设备后复制配置参数","textChars":11,"textLines":1,"bbox":[520,180,380,30]}
+{"kind":"shape","id":"sh/943mhgre","slide":3,"bbox":[520,252,8,8]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"text":"服务器根地址：<RELAY_BASE_URL>","textPreview":"服务器根地址：<RELAY_BASE_URL>","textChars":23,"textLines":1,"bbox":[542,244,580,60]}
+{"kind":"shape","id":"sh/v6l4jq94","slide":3,"bbox":[520,304,8,8]}
+{"kind":"textbox","id":"sh/a5c3ql8z","slide":3,"text":"设备 UUID：来自后台设备记录","textPreview":"设备 UUID：来自后台设备记录","textChars":16,"textLines":1,"bbox":[542,296,580,60]}
+{"kind":"shape","id":"sh/x8nml0ra","slide":3,"bbox":[520,356,8,8]}
+{"kind":"textbox","id":"sh/w7ulsvqp","slide":3,"text":"Android HMAC 密钥 / iOS Bearer Token","textPreview":"Android HMAC 密钥 / iOS Bearer Token","textChars":34,"textLines":1,"bbox":[542,348,580,60]}
+{"kind":"shape","id":"sh/ja54na9g","slide":3,"bbox":[520,408,8,8]}
+{"kind":"textbox","id":"sh/i9w3u58v","slide":3,"text":"设备类型和鉴权方式必须匹配","textPreview":"设备类型和鉴权方式必须匹配","textChars":13,"textLines":1,"bbox":[542,400,580,60]}
+{"kind":"shape","id":"sh/e10f2twf","slide":3,"bbox":[520,472,560,108]}
+{"kind":"textbox","id":"sh/f29gbyx0","slide":3,"text":"凭据说明","textPreview":"凭据说明","textChars":4,"textLines":1,"bbox":[536,485,528,24]}
+{"kind":"textbox","id":"sh/03ix43e5","slide":3,"text":"创建设备时复制 UUID 和对应凭据，用于客户端配置。","textPreview":"创建设备时复制 UUID 和对应凭据，用于客户端配置。","textChars":27,"textLines":1,"bbox":[536,516,528,50]}
+{"kind":"textbox","id":"sh/14ryd8fq","slide":3,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/6d0fytg3","slide":3,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"SMS RELAY HUB","textShapes":19}
+{"kind":"textbox","id":"sh/2xkrih8b","slide":4,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"text":"Android Root 模块：只选择当前 ARM 包","textPreview":"Android Root 模块：只选择当前 ARM 包","textChars":27,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/rm1k7yt4","slide":4,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"text":"支持运行时","textPreview":"支持运行时","textChars":5,"textLines":1,"bbox":[72,180,280,28]}
+{"kind":"textbox","id":"sh/doj29oba","slide":4,"text":"arm64-v8a\n主流 64 位 Android 真机","textPreview":"arm64-v8a | 主流 64 位 Android 真机","textChars":28,"textLines":2,"bbox":[72,230,400,92]}
+{"kind":"textbox","id":"sh/sna103ap","slide":4,"text":"armeabi-v7a\n32 位 ARMv7 设备","textPreview":"armeabi-v7a | 32 位 ARMv7 设备","textChars":25,"textLines":2,"bbox":[72,358,400,92]}
+{"kind":"shape","id":"sh/3ihk3et8","slide":4,"bbox":[528,194,2,310]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"text":"安装步骤","textPreview":"安装步骤","textChars":4,"textLines":1,"bbox":[594,180,250,28]}
+{"kind":"textbox","id":"sh/kbm987y5","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[594,234,36,36]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"text":"下载 sms-relay-root-module-0.3.6.zip","textPreview":"下载 sms-relay-root-module-0.3.6.zip","textChars":34,"textLines":1,"bbox":[638,232,540,56]}
+{"kind":"textbox","id":"sh/i94r6xgz","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[594,296,36,36]}
+{"kind":"textbox","id":"sh/jadsz2xk","slide":4,"text":"在 Magisk / KernelSU / APatch 从存储安装","textPreview":"在 Magisk / KernelSU / APatch 从存储安装","textChars":34,"textLines":1,"bbox":[638,294,540,56]}
+{"kind":"textbox","id":"sh/w72947yt","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[594,358,36,36]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"text":"重启手机并确认模块启用","textPreview":"重启手机并确认模块启用","textChars":11,"textLines":1,"bbox":[638,356,540,56]}
+{"kind":"textbox","id":"sh/a5kr2xg3","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[594,420,36,36]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"text":"点击模块执行打开控制台；也可手动打开 http://127.0.0.1:35000/","textPreview":"点击模块执行打开控制台；也可手动打开 http://127.0.0.1:35000/","textChars":42,"textLines":1,"bbox":[638,418,540,56]}
+{"kind":"shape","id":"sh/g36tgryd","slide":4,"bbox":[594,510,540,108]}
+{"kind":"textbox","id":"sh/h4fa9wfy","slide":4,"text":"控制台","textPreview":"控制台","textChars":3,"textLines":1,"bbox":[610,523,508,24]}
+{"kind":"textbox","id":"sh/p0batw72","slide":4,"text":"默认地址 http://127.0.0.1:35000/；模块启用后可直接打开。","textPreview":"默认地址 http://127.0.0.1:35000/；模块启用后可直接打开。","textChars":40,"textLines":1,"bbox":[610,554,508,50]}
+{"kind":"textbox","id":"sh/oz29krqh","slide":4,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/3ytsrmpw","slide":4,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"SMS RELAY HUB","textShapes":13}
+{"kind":"textbox","id":"sh/gfi5grih","slide":5,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"text":"Android 配置：首次安装或卸载重装后重新填写参数","textPreview":"Android 配置：首次安装或卸载重装后重新填写参数","textChars":27,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/cf2tcr61","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/z2tcnm5s","slide":5,"bbox":[72,144,1136,1]}
+{"kind":"shape","id":"sh/yhkbe1o7","slide":5,"bbox":[72,184,510,410]}
+{"kind":"textbox","id":"sh/l4bupwny","slide":5,"text":"/data/adb/sms-relay/config.json\n{\n  \"schema_version\": 2,\n  \"enabled\": true,\n  \"base_url\": \"http://服务器IP:端口\",\n  \"allow_insecure_local_http\": true,\n  \"device_id\": \"后台设备 UUID\",\n  \"hmac_secret\": \"后台生成的 HMAC 密钥\",\n  \"source\": \"root_module\",\n  \"android_user_id\": 0,\n  \"initial_sync_mode\": \"new_only\",\n  \"sms_database_path\": \"\"\n}","textPreview":"/data/adb/sms-relay/config.json | { |   \"schema_version\": 2, |   \"enabled\": true, |   \"base_url\": \"http://服务器IP:端口\", |   \"allow_insecure_...","textChars":321,"textLines":13,"bbox":[88,198,478,382]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"text":"参数说明","textPreview":"参数说明","textChars":4,"textLines":1,"bbox":[650,184,260,28]}
+{"kind":"shape","id":"sh/n6dcr65o","slide":5,"bbox":[650,246,8,8]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"text":"base_url 只填服务器根地址","textPreview":"base_url 只填服务器根地址","textChars":17,"textLines":1,"bbox":[672,238,480,66]}
+{"kind":"shape","id":"sh/w32dkbuh","slide":5,"bbox":[650,304,8,8]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"text":"sms_database_path 留空 = 自动检测 CE/DE","textPreview":"sms_database_path 留空 = 自动检测 CE/DE","textChars":33,"textLines":1,"bbox":[672,296,480,66]}
+{"kind":"shape","id":"sh/ahkvi1cb","slide":5,"bbox":[650,362,8,8]}
+{"kind":"textbox","id":"sh/v2twb6dw","slide":5,"text":"watcher 变化监听；poll 是补偿扫描","textPreview":"watcher 变化监听；poll 是补偿扫描","textChars":23,"textLines":1,"bbox":[672,354,480,66]}
+{"kind":"shape","id":"sh/k7mxovud","slide":5,"bbox":[650,420,8,8]}
+{"kind":"textbox","id":"sh/58vehgvy","slide":5,"text":"网络退避只用于失败重试，不阻塞首次上传","textPreview":"网络退避只用于失败重试，不阻塞首次上传","textChars":19,"textLines":1,"bbox":[672,412,480,66]}
+{"kind":"shape","id":"sh/i54fmlc7","slide":5,"bbox":[650,500,480,108]}
+{"kind":"textbox","id":"sh/j6dwfqds","slide":5,"text":"重要","textPreview":"重要","textChars":2,"textLines":1,"bbox":[666,513,448,24]}
+{"kind":"textbox","id":"sh/sb6xsvu9","slide":5,"text":"模块不会读取启用前历史短信，不会修改已读、删除或归档状态。","textPreview":"模块不会读取启用前历史短信，不会修改已读、删除或归档状态。","textChars":29,"textLines":1,"bbox":[666,544,448,50]}
+{"kind":"textbox","id":"sh/tcfel0vu","slide":5,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/hgrmpwj2","slide":5,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"SMS RELAY HUB","textShapes":14}
+{"kind":"textbox","id":"sh/qpwnet0b","slide":6,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"text":"Android 验收：先看本机状态，再发一条新短信","textPreview":"Android 验收：先看本机状态，再发一条新短信","textChars":25,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/87ipkzal","slide":6,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"text":"Root 终端自检命令","textPreview":"Root 终端自检命令","textChars":11,"textLines":1,"bbox":[72,182,340,28]}
+{"kind":"shape","id":"sh/ml07i9sv","slide":6,"bbox":[72,232,520,178]}
+{"kind":"textbox","id":"sh/7m98ru9g","slide":6,"text":"/system/bin/sms-relay-runtime --self-test\n/system/bin/sms-relay-runtime check-config \\\n  --config /data/adb/sms-relay/config.json\nsh /data/adb/modules/sms-relay-root/action.sh status","textPreview":"/system/bin/sms-relay-runtime --self-test | /system/bin/sms-relay-runtime check-config \\ |   --config /data/adb/sms-relay/config.json | s...","textChars":182,"textLines":4,"bbox":[88,246,488,150]}
+{"kind":"textbox","id":"sh/oryp8fah","slide":6,"text":"故障定位","textPreview":"故障定位","textChars":4,"textLines":1,"bbox":[660,182,260,28]}
+{"kind":"shape","id":"sh/pc76hkr2","slide":6,"bbox":[660,240,8,8]}
+{"kind":"textbox","id":"sh/h4bupgn6","slide":6,"text":"没有记录：检查设备启用、UUID/HMAC、HTTP(S) 地址和网络","textPreview":"没有记录：检查设备启用、UUID/HMAC、HTTP(S) 地址和网络","textChars":35,"textLines":1,"bbox":[682,232,480,62]}
+{"kind":"shape","id":"sh/w32twb6l","slide":6,"bbox":[660,294,8,8]}
+{"kind":"textbox","id":"sh/v2tcn650","slide":6,"text":"401：重新轮换凭据并更新模块","textPreview":"401：重新轮换凭据并更新模块","textChars":15,"textLines":1,"bbox":[682,286,480,62]}
+{"kind":"shape","id":"sh/u1kbu1ov","slide":6,"bbox":[660,348,8,8]}
+{"kind":"textbox","id":"sh/5svutgni","slide":6,"text":"SIM 未识别：看 subscription，必要时手动绑定手机号","textPreview":"SIM 未识别：看 subscription，必要时手动绑定手机号","textChars":33,"textLines":1,"bbox":[682,340,480,62]}
+{"kind":"shape","id":"sh/47mt0b6x","slide":6,"bbox":[660,402,8,8]}
+{"kind":"textbox","id":"sh/j6dcr65c","slide":6,"text":"延迟：确认 watcher；不要先盲目缩短网络退避","textPreview":"延迟：确认 watcher；不要先盲目缩短网络退避","textChars":25,"textLines":1,"bbox":[682,394,480,62]}
+{"kind":"shape","id":"sh/i54bylor","slide":6,"bbox":[72,478,1040,108]}
+{"kind":"textbox","id":"sh/twfux0ne","slide":6,"text":"验收动作","textPreview":"验收动作","textChars":4,"textLines":1,"bbox":[88,491,1008,24]}
+{"kind":"textbox","id":"sh/svmt4v6t","slide":6,"text":"安装完成后发送一条全新的短信，再刷新后台消息页；旧短信不能作为首次验收样本。","textPreview":"安装完成后发送一条全新的短信，再刷新后台消息页；旧短信不能作为首次验收样本。","textChars":38,"textLines":1,"bbox":[88,522,1008,50]}
+{"kind":"textbox","id":"sh/cbe5g3ih","slide":6,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/dcnm98zm","slide":6,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"SMS RELAY HUB","textShapes":17}
+{"kind":"textbox","id":"sh/50v2pgna","slide":7,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"text":"iPhone 快捷指令：只准备三项","textPreview":"iPhone 快捷指令：只准备三项","textChars":17,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/dcbud0ra","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/ydkbm5sv","slide":7,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"text":"快捷指令只负责转发整条短信；字段、时间和去重由服务端完成。","textPreview":"快捷指令只负责转发整条短信；字段、时间和去重由服务端完成。","textChars":29,"textLines":1,"bbox":[72,180,1060,32]}
+{"kind":"textbox","id":"sh/kzmdova1","slide":7,"text":"服务器","textPreview":"服务器","textChars":3,"textLines":1,"bbox":[86,260,120,28]}
+{"kind":"textbox","id":"sh/l0vuh0rm","slide":7,"text":"<RELAY_BASE_URL>","textPreview":"<RELAY_BASE_URL>","textChars":16,"textLines":1,"bbox":[250,258,450,32]}
+{"kind":"textbox","id":"sh/eh0ba1sr","slide":7,"text":"本地私网可用 HTTP，生产环境建议 HTTPS","textPreview":"本地私网可用 HTTP，生产环境建议 HTTPS","textChars":24,"textLines":1,"bbox":[760,262,330,28]}
+{"kind":"shape","id":"sh/fi9c369c","slide":7,"bbox":[72,316,1050,1]}
+{"kind":"textbox","id":"sh/baxkjqlk","slide":7,"text":"凭据","textPreview":"凭据","textChars":2,"textLines":1,"bbox":[86,372,120,28]}
+{"kind":"textbox","id":"sh/a9ojq5kz","slide":7,"text":"<DEVICE_TOKEN>","textPreview":"<DEVICE_TOKEN>","textChars":14,"textLines":1,"bbox":[250,370,450,32]}
+{"kind":"textbox","id":"sh/xcz2l03q","slide":7,"text":"只放 Authorization 请求头","textPreview":"只放 Authorization 请求头","textChars":20,"textLines":1,"bbox":[760,374,330,28]}
+{"kind":"shape","id":"sh/cbq1sv25","slide":7,"bbox":[72,428,1050,1]}
+{"kind":"textbox","id":"sh/n6x0fqlo","slide":7,"text":"短信输入","textPreview":"短信输入","textChars":4,"textLines":1,"bbox":[86,484,120,28]}
+{"kind":"textbox","id":"sh/25ojml43","slide":7,"text":"输入快捷指令的信息","textPreview":"输入快捷指令的信息","textChars":9,"textLines":1,"bbox":[250,482,450,32]}
+{"kind":"textbox","id":"sh/p8fih03e","slide":7,"text":"选择整条信息，不选“内容”","textPreview":"选择整条信息，不选“内容”","textChars":13,"textLines":1,"bbox":[760,486,330,28]}
+{"kind":"shape","id":"sh/o761ov2t","slide":7,"bbox":[72,540,1050,1]}
+{"kind":"shape","id":"sh/f2d0b6lc","slide":7,"bbox":[72,570,1050,108]}
+{"kind":"textbox","id":"sh/eh4jil4r","slide":7,"text":"请求格式","textPreview":"请求格式","textChars":4,"textLines":1,"bbox":[88,583,1018,24]}
+{"kind":"textbox","id":"sh/id4ju1oz","slide":7,"text":"请求体只提交短信内容和设备 Token；其他字段由服务端生成。","textPreview":"请求体只提交短信内容和设备 Token；其他字段由服务端生成。","textChars":31,"textLines":1,"bbox":[88,614,1018,50]}
+{"kind":"textbox","id":"sh/jedkn654","slide":7,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/4fm1wb6p","slide":7,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\nApple Shortcuts action names can vary by iOS version; validate the final action order on the real iPhone."}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"SMS RELAY HUB","textShapes":16}
+{"kind":"textbox","id":"sh/lgbepgvm","slide":8,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"text":"iPhone 只需两个动作和一个 JSON 字段","textPreview":"iPhone 只需两个动作和一个 JSON 字段","textChars":24,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/ri9g7uhw","slide":8,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[72,188,36,36]}
+{"kind":"textbox","id":"sh/tkby9kzm","slide":8,"text":"保留“文本”动作：只填写设备 Token","textPreview":"保留“文本”动作：只填写设备 Token","textChars":20,"textLines":1,"bbox":[116,186,1060,58]}
+{"kind":"textbox","id":"sh/sjix0zy1","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[72,252,36,36]}
+{"kind":"textbox","id":"sh/je9g3ahk","slide":8,"text":"保留“获取 URL 内容”：POST 简化入口","textPreview":"保留“获取 URL 内容”：POST 简化入口","textChars":23,"textLines":1,"bbox":[116,250,1060,58]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[72,316,36,36]}
+{"kind":"textbox","id":"sh/o7ydoret","slide":8,"text":"请求头：Authorization Bearer Token；Content-Type JSON","textPreview":"请求头：Authorization Bearer Token；Content-Type JSON","textChars":48,"textLines":1,"bbox":[116,314,1060,58]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[72,380,36,36]}
+{"kind":"textbox","id":"sh/m5gvmhwn","slide":8,"text":"请求体只建立一个字段：message","textPreview":"请求体只建立一个字段：message","textChars":18,"textLines":1,"bbox":[116,378,1060,58]}
+{"kind":"textbox","id":"sh/n6pwfmd8","slide":8,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[72,444,36,36]}
+{"kind":"textbox","id":"sh/0jydkreh","slide":8,"text":"message 的值选择“输入快捷指令的信息”","textPreview":"message 的值选择“输入快捷指令的信息”","textChars":23,"textLines":1,"bbox":[116,442,1060,58]}
+{"kind":"shape","id":"sh/1k7edwv2","slide":8,"bbox":[72,534,1050,98]}
+{"kind":"textbox","id":"sh/ehgvihwr","slide":8,"text":"POST <RELAY_BASE_URL>/api/v1/ingest/shortcut\nAuthorization: Bearer <设备 Token>\nContent-Type: application/json\nJSON: {\"message\":\"输入快捷指令的信息\"}","textPreview":"POST <RELAY_BASE_URL>/api/v1/ingest/shortcut | Authorization: Bearer <设备 Token> | Content-Type: application/json | JSON: {\"message\":\"输入快捷...","textChars":138,"textLines":4,"bbox":[88,548,1018,70]}
+{"kind":"textbox","id":"sh/zipwbmdc","slide":8,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/kfixwbe1","slide":8,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\nRequest contract is defined in ios-shortcut/shortcut-definition.md and ios-shortcut/request-contract.md."}
+{"kind":"slide","id":"sl/udsvah03","slide":9,"title":"SMS RELAY HUB","textShapes":19}
+{"kind":"textbox","id":"sh/u9sja98z","slide":9,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/1cfmhgne","slide":9,"text":"iPhone 运行结果与状态码","textPreview":"iPhone 运行结果与状态码","textChars":15,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/0b65obm9","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/nex4jq5k","slide":9,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/mdonql4z","slide":9,"text":"HTTP 状态","textPreview":"HTTP 状态","textChars":7,"textLines":1,"bbox":[82,184,240,28]}
+{"kind":"textbox","id":"sh/9gzml0nq","slide":9,"text":"快捷指令显示","textPreview":"快捷指令显示","textChars":6,"textLines":1,"bbox":[360,184,430,28]}
+{"kind":"shape","id":"sh/ofq5svm5","slide":9,"bbox":[72,220,1040,1]}
+{"kind":"textbox","id":"sh/bih4na5w","slide":9,"text":"201","textPreview":"201","textChars":3,"textLines":1,"bbox":[82,232,240,34]}
+{"kind":"textbox","id":"sh/ah8nu54b","slide":9,"text":"已同步","textPreview":"已同步","textChars":3,"textLines":1,"bbox":[360,232,700,34]}
+{"kind":"shape","id":"sh/oza1gfyh","slide":9,"bbox":[72,290,1040,1]}
+{"kind":"textbox","id":"sh/p0ji9kf2","slide":9,"text":"200 + duplicate=true","textPreview":"200 + duplicate=true","textChars":20,"textLines":1,"bbox":[82,302,240,34]}
+{"kind":"textbox","id":"sh/2xsjepgb","slide":9,"text":"已同步（重复触发，未重复保存）","textPreview":"已同步（重复触发，未重复保存）","textChars":15,"textLines":1,"bbox":[360,302,700,34]}
+{"kind":"shape","id":"sh/3y107axw","slide":9,"bbox":[72,360,1040,1]}
+{"kind":"textbox","id":"sh/cnu1kzyd","slide":9,"text":"401","textPreview":"401","textChars":3,"textLines":1,"bbox":[82,372,240,34]}
+{"kind":"textbox","id":"sh/do3id4fy","slide":9,"text":"设备凭据无效，请更新 Token","textPreview":"设备凭据无效，请更新 Token","textChars":16,"textLines":1,"bbox":[360,372,700,34]}
+{"kind":"shape","id":"sh/qlcjipgn","slide":9,"bbox":[72,430,1040,1]}
+{"kind":"textbox","id":"sh/bml0buxs","slide":9,"text":"413 / 422","textPreview":"413 / 422","textChars":9,"textLines":1,"bbox":[82,442,240,34]}
+{"kind":"textbox","id":"sh/0ru1ozyp","slide":9,"text":"检查 message 是否为空或过大","textPreview":"检查 message 是否为空或过大","textChars":18,"textLines":1,"bbox":[360,442,700,34]}
+{"kind":"shape","id":"sh/lsn2h4fa","slide":9,"bbox":[72,500,1040,1]}
+{"kind":"textbox","id":"sh/98ji147e","slide":9,"text":"503 / 无响应","textPreview":"503 / 无响应","textChars":9,"textLines":1,"bbox":[82,512,240,34]}
+{"kind":"textbox","id":"sh/87a18zqt","slide":9,"text":"稍后重试 / 检查网络和 HTTP(S) 地址","textPreview":"稍后重试 / 检查网络和 HTTP(S) 地址","textChars":23,"textLines":1,"bbox":[360,512,700,34]}
+{"kind":"shape","id":"sh/76h0zup8","slide":9,"bbox":[72,590,1040,108]}
+{"kind":"textbox","id":"sh/ml8j6p8n","slide":9,"text":"去重由服务端完成","textPreview":"去重由服务端完成","textChars":8,"textLines":1,"bbox":[88,603,1008,24]}
+{"kind":"textbox","id":"sh/hcji5o7a","slide":9,"text":"服务端读取日期、发件人和正文并生成幂等键；同一短信重复触发返回 200，不重复保存。","textPreview":"服务端读取日期、发件人和正文并生成幂等键；同一短信重复触发返回 200，不重复保存。","textChars":42,"textLines":1,"bbox":[88,634,1008,50]}
+{"kind":"textbox","id":"sh/wba1cjqp","slide":9,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/va103ep4","slide":9,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}
+{"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"SMS RELAY HUB","textShapes":27}
+{"kind":"textbox","id":"sh/exsrmhsf","slide":10,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/xc3mho32","slide":10,"text":"自动化验收：前台一次，锁屏一次，重复一次","textPreview":"自动化验收：前台一次，锁屏一次，重复一次","textChars":20,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/cbu58j2h","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/zelojyl8","slide":10,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/ydcnatkn","slide":10,"text":"场景","textPreview":"场景","textChars":2,"textLines":1,"bbox":[72,186,245,28]}
+{"kind":"textbox","id":"sh/l036l83y","slide":10,"text":"操作","textPreview":"操作","textChars":2,"textLines":1,"bbox":[360,186,245,28]}
+{"kind":"textbox","id":"sh/kzu5c32t","slide":10,"text":"预期","textPreview":"预期","textChars":2,"textLines":1,"bbox":[652,186,245,28]}
+{"kind":"textbox","id":"sh/725onyl4","slide":10,"text":"失败时先看","textPreview":"失败时先看","textChars":5,"textLines":1,"bbox":[944,186,245,28]}
+{"kind":"shape","id":"sh/m1cnetkj","slide":10,"bbox":[72,224,1040,1]}
+{"kind":"textbox","id":"sh/s7yt4b21","slide":10,"text":"前台","textPreview":"前台","textChars":2,"textLines":1,"bbox":[72,236,245,48]}
+{"kind":"textbox","id":"sh/d87uxg3m","slide":10,"text":"运行快捷指令 + 新短信","textPreview":"运行快捷指令 + 新短信","textChars":12,"textLines":1,"bbox":[360,236,245,48]}
+{"kind":"textbox","id":"sh/q5gb21kb","slide":10,"text":"201 / 已同步","textPreview":"201 / 已同步","textChars":9,"textLines":1,"bbox":[652,236,245,48]}
+{"kind":"textbox","id":"sh/r6pcv6lw","slide":10,"text":"Token、URL、JSON","textPreview":"Token、URL、JSON","textChars":14,"textLines":1,"bbox":[944,236,245,48]}
+{"kind":"shape","id":"sh/0bit8b2d","slide":10,"bbox":[72,300,1040,1]}
+{"kind":"textbox","id":"sh/1cru1g3y","slide":10,"text":"锁屏","textPreview":"锁屏","textChars":2,"textLines":1,"bbox":[72,312,245,48]}
+{"kind":"textbox","id":"sh/e9gb61k7","slide":10,"text":"自动化收到新短信","textPreview":"自动化收到新短信","textChars":8,"textLines":1,"bbox":[360,312,245,48]}
+{"kind":"textbox","id":"sh/fapcz6ls","slide":10,"text":"后台出现新记录","textPreview":"后台出现新记录","textChars":7,"textLines":1,"bbox":[652,312,245,48]}
+{"kind":"textbox","id":"sh/ozitcv29","slide":10,"text":"自动化确认、系统策略","textPreview":"自动化确认、系统策略","textChars":10,"textLines":1,"bbox":[944,312,245,48]}
+{"kind":"shape","id":"sh/p0ru503u","slide":10,"bbox":[72,376,1040,1]}
+{"kind":"textbox","id":"sh/xwnupgvy","slide":10,"text":"重复","textPreview":"重复","textChars":2,"textLines":1,"bbox":[72,388,245,48]}
+{"kind":"textbox","id":"sh/wvetgbud","slide":10,"text":"同一短信再次触发","textPreview":"同一短信再次触发","textChars":8,"textLines":1,"bbox":[360,388,245,48]}
+{"kind":"textbox","id":"sh/bu5cnqd8","slide":10,"text":"200 duplicate","textPreview":"200 duplicate","textChars":13,"textLines":1,"bbox":[652,388,245,48]}
+{"kind":"textbox","id":"sh/atwbelcn","slide":10,"text":"日期/正文是否改变","textPreview":"日期/正文是否改变","textChars":9,"textLines":1,"bbox":[944,388,245,48]}
+{"kind":"shape","id":"sh/lk7ut0va","slide":10,"bbox":[72,452,1040,1]}
+{"kind":"textbox","id":"sh/kjytkvup","slide":10,"text":"断网","textPreview":"断网","textChars":2,"textLines":1,"bbox":[72,464,245,48]}
+{"kind":"textbox","id":"sh/jypcrqd4","slide":10,"text":"关闭网络后触发","textPreview":"关闭网络后触发","textChars":7,"textLines":1,"bbox":[360,464,245,48]}
+{"kind":"textbox","id":"sh/yxgbilcj","slide":10,"text":"显示网络失败","textPreview":"显示网络失败","textChars":6,"textLines":1,"bbox":[652,464,245,48]}
+{"kind":"textbox","id":"sh/1o3ahwvq","slide":10,"text":"恢复网络后重试","textPreview":"恢复网络后重试","textChars":7,"textLines":1,"bbox":[944,464,245,48]}
+{"kind":"shape","id":"sh/0nut8rul","slide":10,"bbox":[72,570,1040,108]}
+{"kind":"textbox","id":"sh/q9srixs3","slide":10,"text":"判定标准","textPreview":"判定标准","textChars":4,"textLines":1,"bbox":[88,583,1008,24]}
+{"kind":"textbox","id":"sh/ru18r2to","slide":10,"text":"不能只看到“快捷指令运行过”；必须在后台消息页看到新记录，并确认状态码。","textPreview":"不能只看到“快捷指令运行过”；必须在后台消息页看到新记录，并确认状态码。","textChars":36,"textLines":1,"bbox":[88,614,1008,50]}
+{"kind":"textbox","id":"sh/cva9k7a9","slide":10,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/dwjqtcbu","slide":10,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/m90b6t0r","slide":10,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\nThe acceptance matrix is an internal operational checklist; actual lock-screen behavior must be recorded on the user-provided iPhone."}
+{"kind":"slide","id":"sl/jetc3ut0","slide":11,"title":"SMS RELAY HUB","textShapes":14}
+{"kind":"textbox","id":"sh/7650nq5s","slide":11,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/xcryxg7y","slide":11,"text":"服务器部署是全新生产库，不会带入本机测试数据","textPreview":"服务器部署是全新生产库，不会带入本机测试数据","textChars":22,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/wbih4b6d","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/n69grmpw","slide":11,"bbox":[72,144,1136,1]}
+{"kind":"textbox","id":"sh/250zy18b","slide":11,"text":"Docker Compose 部署","textPreview":"Docker Compose 部署","textChars":17,"textLines":1,"bbox":[72,184,360,28]}
+{"kind":"shape","id":"sh/98rytw72","slide":11,"bbox":[72,236,510,130]}
+{"kind":"textbox","id":"sh/o7ih0r6h","slide":11,"text":"docker compose --env-file deploy/.env \\\n  -f deploy/compose.yml up --build -d\ndocker compose --env-file deploy/.env \\\n  -f deploy/compose.yml ps","textPreview":"docker compose --env-file deploy/.env \\ |   -f deploy/compose.yml up --build -d | docker compose --env-file deploy/.env \\ |   -f deploy/c...","textChars":144,"textLines":4,"bbox":[88,250,478,102]}
+{"kind":"textbox","id":"sh/72t03qp0","slide":11,"text":"部署检查","textPreview":"部署检查","textChars":4,"textLines":1,"bbox":[660,184,260,28]}
+{"kind":"shape","id":"sh/61kzalof","slide":11,"bbox":[660,246,8,8]}
+{"kind":"textbox","id":"sh/ofqtgnyt","slide":11,"text":"/api/v1/health 返回可用","textPreview":"/api/v1/health 返回可用","textChars":19,"textLines":1,"bbox":[682,238,480,66]}
+{"kind":"shape","id":"sh/9gza9sze","slide":11,"bbox":[660,304,8,8]}
+{"kind":"textbox","id":"sh/mdobedg3","slide":11,"text":"后台 runtime 的 database_backend = postgresql","textPreview":"后台 runtime 的 database_backend = postgresql","textChars":42,"textLines":1,"bbox":[682,296,480,66]}
+{"kind":"shape","id":"sh/nehs7iho","slide":11,"bbox":[660,362,8,8]}
+{"kind":"textbox","id":"sh/0b6tc3yx","slide":11,"text":"PostgreSQL 使用命名卷 postgres_data","textPreview":"PostgreSQL 使用命名卷 postgres_data","textChars":30,"textLines":1,"bbox":[682,354,480,66]}
+{"kind":"shape","id":"sh/1cfa58zi","slide":11,"bbox":[660,420,8,8]}
+{"kind":"textbox","id":"sh/epobatgr","slide":11,"text":"不会读取工作区 relay-dev-live.db 或客户端本地队列","textPreview":"不会读取工作区 relay-dev-live.db 或客户端本地队列","textChars":34,"textLines":1,"bbox":[682,412,480,66]}
+{"kind":"shape","id":"sh/zaxs3yhc","slide":11,"bbox":[72,500,1040,108]}
+{"kind":"textbox","id":"sh/cn6t83y1","slide":11,"text":"当前限制","textPreview":"当前限制","textChars":4,"textLines":1,"bbox":[88,513,1008,24]}
+{"kind":"textbox","id":"sh/dofa18z6","slide":11,"text":"开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。","textPreview":"开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。","textChars":65,"textLines":1,"bbox":[88,544,1008,50]}
+{"kind":"textbox","id":"sh/tsnip0ny","slide":11,"text":"第一版部署教程 · 示例值均为占位符","textPreview":"第一版部署教程 · 示例值均为占位符","textChars":18,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/87ehgv6d","slide":11,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/jetc3ut0","slide":11,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\nDeployment details from deploy/README.md. The Debian 12 screenshot confirms the target OS only; it does not prove CPU, RAM, disk, ports, or Docker service state."}
+{"kind":"slide","id":"sl/8f2psfyx","slide":12,"title":"SMS RELAY HUB","textShapes":12}
+{"kind":"textbox","id":"sh/gj25cry9","slide":12,"text":"SMS RELAY HUB","textPreview":"SMS RELAY HUB","textChars":13,"textLines":1,"bbox":[72,40,400,24]}
+{"kind":"textbox","id":"sh/1gbm9s3a","slide":12,"text":"最终验收清单：每台设备都留下可复核证据","textPreview":"最终验收清单：每台设备都留下可复核证据","textChars":19,"textLines":1,"bbox":[72,72,1030,58]}
+{"kind":"textbox","id":"sh/0f2lgnmp","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1160,45,48,24]}
+{"kind":"shape","id":"sh/ra943il8","slide":12,"bbox":[72,144,1136,1]}
+{"kind":"shape","id":"sh/q903ad4n","slide":12,"bbox":[72,198,8,8]}
+{"kind":"textbox","id":"sh/dcbm583y","slide":12,"text":"后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer","textPreview":"后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer","textChars":50,"textLines":1,"bbox":[94,190,1040,70]}
+{"kind":"shape","id":"sh/sb2lcnmd","slide":12,"bbox":[72,260,8,8]}
+{"kind":"textbox","id":"sh/b6d4f2lc","slide":12,"text":"真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git","textPreview":"真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git","textChars":31,"textLines":1,"bbox":[94,252,1040,70]}
+{"kind":"shape","id":"sh/a543mx4r","slide":12,"bbox":[72,322,8,8]}
+{"kind":"textbox","id":"sh/wvupgz6t","slide":12,"text":"Android 安装当前模块包，并通过模块执行检查控制台和运行状态","textPreview":"Android 安装当前模块包，并通过模块执行检查控制台和运行状态","textChars":33,"textLines":1,"bbox":[94,314,1040,70]}
+{"kind":"shape","id":"sh/xw3q94ne","slide":12,"bbox":[72,384,8,8]}
+{"kind":"textbox","id":"sh/atc7epon","slide":12,"text":"iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录","textPreview":"iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录","textChars":35,"textLines":1,"bbox":[94,376,1040,70]}
+{"kind":"shape","id":"sh/bulo7u58","slide":12,"bbox":[72,446,8,8]}
+{"kind":"textbox","id":"sh/orapcf6h","slide":12,"text":"服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过","textPreview":"服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过","textChars":52,"textLines":1,"bbox":[94,438,1040,70]}
+{"kind":"shape","id":"sh/9sj65kn2","slide":12,"bbox":[72,508,8,8]}
+{"kind":"textbox","id":"sh/mps7a5or","slide":12,"text":"失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”","textPreview":"失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”","textChars":31,"textLines":1,"bbox":[94,500,1040,70]}
+{"kind":"shape","id":"sh/nq1o3a5w","slide":12,"bbox":[72,590,1040,3]}
+{"kind":"textbox","id":"sh/0nap8f6l","slide":12,"text":"完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。","textPreview":"完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。","textChars":39,"textLines":1,"bbox":[72,612,1040,32]}
+{"kind":"textbox","id":"sh/1oj61kn6","slide":12,"text":"教程与控制台设备页同步 · 后续再扩展 APK/app","textPreview":"教程与控制台设备页同步 · 后续再扩展 APK/app","textChars":27,"textLines":1,"bbox":[72,680,900,20]}
+{"kind":"textbox","id":"sh/hkbm5wzu","slide":12,"text":"Relay Hub","textPreview":"Relay Hub","textChars":9,"textLines":1,"bbox":[1060,680,148,20]}
+{"kind":"notes","id":"nt/8f2psfyx","slide":12,"text":"[Sources]\nInternal repository: clients/root-module/README.md; ios-shortcut/shortcut-definition.md; deploy/README.md; backend/app/api/relay.py.\n"}

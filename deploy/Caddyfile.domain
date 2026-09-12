@@ -1,0 +1,22 @@
+(relay_proxy) {
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+    }
+
+    reverse_proxy app:{$APP_PORT}
+}
+
+:80 {
+    @domain host __RELAY_DOMAIN__
+    redir @domain https://__RELAY_DOMAIN__{uri}
+    import relay_proxy
+}
+
+__RELAY_DOMAIN__ {
+    import relay_proxy
+}

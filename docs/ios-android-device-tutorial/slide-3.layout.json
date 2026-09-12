@@ -1,0 +1,1216 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/ofy9wn61",
+    "id": "ofy9wn61",
+    "slide": 3,
+    "layoutId": "/ppt/slideLayouts/slideLayout1.xml",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "Calibri Light",
+        "eastAsianTypeface": "Calibri Light",
+        "complexScriptTypeface": "Calibri Light"
+      },
+      "minorFont": {
+        "latinTypeface": "Calibri",
+        "eastAsianTypeface": "Calibri",
+        "complexScriptTypeface": "Calibri"
+      }
+    },
+    "typefaces": [
+      "Calibri",
+      "Calibri Light"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout1.xml",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/re9g7yxo",
+      "id": "25",
+      "bbox": [
+        72,
+        40,
+        400,
+        24
+      ],
+      "geometry": "rect",
+      "text": "SMS RELAY HUB",
+      "textPreview": "SMS RELAY HUB",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SMS RELAY HUB"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SMS RELAY HUB",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SMS RELAY HUB",
+              "fontSize": 12,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cza94vmx",
+      "id": "2",
+      "bbox": [
+        72,
+        72,
+        1030,
+        58
+      ],
+      "geometry": "rect",
+      "text": "后台先创建设备，再把凭据交给客户端",
+      "textPreview": "后台先创建设备，再把凭据交给客户端",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "后台先创建设备，再把凭据交给客户端"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "后台先创建设备，再把凭据交给客户端",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "后台先创建设备，再把凭据交给客户端",
+              "fontSize": 36,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d0jax03i",
+      "id": "3",
+      "bbox": [
+        1160,
+        45,
+        48,
+        24
+      ],
+      "geometry": "rect",
+      "text": "03",
+      "textPreview": "03",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "03"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "03",
+          "resolvedTextStyle": {
+            "fontSize": 14,
+            "color": "#5E6A7D",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "03",
+              "fontSize": 14,
+              "color": "#5E6A7D",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/298ryl4v",
+      "id": "4",
+      "bbox": [
+        72,
+        144,
+        1136,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#C7CDD6",
+      "lineColor": "#C7CDD6",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3ah8rqlg",
+      "id": "5",
+      "bbox": [
+        72,
+        180,
+        360,
+        30
+      ],
+      "geometry": "rect",
+      "text": "设备页 -> 添加设备",
+      "textPreview": "设备页 -> 添加设备",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "设备页 -> 添加设备"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "设备页 -> 添加设备",
+          "resolvedTextStyle": {
+            "fontSize": 23,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "设备页 -> 添加设备",
+              "fontSize": 23,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/obq90bml",
+      "id": "6",
+      "bbox": [
+        72,
+        242,
+        300,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Android Root",
+      "textPreview": "Android Root",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Android Root"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Android Root",
+          "resolvedTextStyle": {
+            "fontSize": 28,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Android Root",
+              "fontSize": 28,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pcjqtg36",
+      "id": "7",
+      "bbox": [
+        72,
+        290,
+        300,
+        30
+      ],
+      "geometry": "rect",
+      "text": "鉴权：hmac",
+      "textPreview": "鉴权：hmac",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "鉴权：hmac"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "鉴权：hmac",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#5E6A7D"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "鉴权：hmac",
+              "fontSize": 19,
+              "color": "#5E6A7D"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/m5cra54z",
+      "id": "8",
+      "bbox": [
+        72,
+        382,
+        340,
+        38
+      ],
+      "geometry": "rect",
+      "text": "iPhone 快捷指令",
+      "textPreview": "iPhone 快捷指令",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "iPhone 快捷指令"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "iPhone 快捷指令",
+          "resolvedTextStyle": {
+            "fontSize": 28,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "iPhone 快捷指令",
+              "fontSize": 28,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/n6ls3alk",
+      "id": "9",
+      "bbox": [
+        72,
+        430,
+        300,
+        30
+      ],
+      "geometry": "rect",
+      "text": "鉴权：bearer",
+      "textPreview": "鉴权：bearer",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "鉴权：bearer"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "鉴权：bearer",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#5E6A7D"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "鉴权：bearer",
+              "fontSize": 19,
+              "color": "#5E6A7D"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/n2l4fq98",
+      "id": "10",
+      "bbox": [
+        450,
+        196,
+        2,
+        320
+      ],
+      "geometry": "rect",
+      "fillColor": "#C7CDD6",
+      "lineColor": "#C7CDD6",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/m1c3mlsn",
+      "id": "11",
+      "bbox": [
+        520,
+        180,
+        380,
+        30
+      ],
+      "geometry": "rect",
+      "text": "创建设备后复制配置参数",
+      "textPreview": "创建设备后复制配置参数",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "创建设备后复制配置参数"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "创建设备后复制配置参数",
+          "resolvedTextStyle": {
+            "fontSize": 23,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "创建设备后复制配置参数",
+              "fontSize": 23,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/943mhgre",
+      "id": "12",
+      "bbox": [
+        520,
+        252,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/83ulovat",
+      "id": "13",
+      "bbox": [
+        542,
+        244,
+        580,
+        60
+      ],
+      "geometry": "rect",
+      "text": "服务器根地址：<RELAY_BASE_URL>",
+      "textPreview": "服务器根地址：<RELAY_BASE_URL>",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "服务器根地址：<RELAY_BASE_URL>"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "服务器根地址：<RELAY_BASE_URL>",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "服务器根地址：<RELAY_BASE_URL>",
+              "fontSize": 20,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/v6l4jq94",
+      "id": "14",
+      "bbox": [
+        520,
+        304,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a5c3ql8z",
+      "id": "15",
+      "bbox": [
+        542,
+        296,
+        580,
+        60
+      ],
+      "geometry": "rect",
+      "text": "设备 UUID：来自后台设备记录",
+      "textPreview": "设备 UUID：来自后台设备记录",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "设备 UUID：来自后台设备记录"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "设备 UUID：来自后台设备记录",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "设备 UUID：来自后台设备记录",
+              "fontSize": 20,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/x8nml0ra",
+      "id": "16",
+      "bbox": [
+        520,
+        356,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w7ulsvqp",
+      "id": "17",
+      "bbox": [
+        542,
+        348,
+        580,
+        60
+      ],
+      "geometry": "rect",
+      "text": "Android HMAC 密钥 / iOS Bearer Token",
+      "textPreview": "Android HMAC 密钥 / iOS Bearer Token",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Android HMAC 密钥 / iOS Bearer Token"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Android HMAC 密钥 / iOS Bearer Token",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Android HMAC 密钥 / iOS Bearer Token",
+              "fontSize": 20,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ja54na9g",
+      "id": "18",
+      "bbox": [
+        520,
+        408,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i9w3u58v",
+      "id": "19",
+      "bbox": [
+        542,
+        400,
+        580,
+        60
+      ],
+      "geometry": "rect",
+      "text": "设备类型和鉴权方式必须匹配",
+      "textPreview": "设备类型和鉴权方式必须匹配",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "设备类型和鉴权方式必须匹配"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "设备类型和鉴权方式必须匹配",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "设备类型和鉴权方式必须匹配",
+              "fontSize": 20,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e10f2twf",
+      "id": "20",
+      "bbox": [
+        520,
+        472,
+        560,
+        108
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFF7E7",
+      "lineColor": "#875208",
+      "lineWidth": 1
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/f29gbyx0",
+      "id": "21",
+      "bbox": [
+        536,
+        485,
+        528,
+        24
+      ],
+      "geometry": "rect",
+      "text": "凭据说明",
+      "textPreview": "凭据说明",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "凭据说明"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "凭据说明",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#875208",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "凭据说明",
+              "fontSize": 16,
+              "color": "#875208",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/03ix43e5",
+      "id": "22",
+      "bbox": [
+        536,
+        516,
+        528,
+        50
+      ],
+      "geometry": "rect",
+      "text": "创建设备时复制 UUID 和对应凭据，用于客户端配置。",
+      "textPreview": "创建设备时复制 UUID 和对应凭据，用于客户端配置。",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "创建设备时复制 UUID 和对应凭据，用于客户端配置。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "创建设备时复制 UUID 和对应凭据，用于客户端配置。",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "创建设备时复制 UUID 和对应凭据，用于客户端配置。",
+              "fontSize": 15,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/14ryd8fq",
+      "id": "23",
+      "bbox": [
+        72,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "第一版部署教程 · 示例值均为占位符",
+      "textPreview": "第一版部署教程 · 示例值均为占位符",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第一版部署教程 · 示例值均为占位符"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第一版部署教程 · 示例值均为占位符",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#5E6A7D"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "第一版部署教程 · 示例值均为占位符",
+              "fontSize": 11,
+              "color": "#5E6A7D"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6d0fytg3",
+      "id": "24",
+      "bbox": [
+        1060,
+        680,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Relay Hub",
+      "textPreview": "Relay Hub",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Relay Hub"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Relay Hub",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#2357C6",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Relay Hub",
+              "fontSize": 11,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

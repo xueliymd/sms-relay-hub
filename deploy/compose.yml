@@ -1,0 +1,113 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sms_relay}
+      POSTGRES_USER: ${POSTGRES_USER:-sms_relay}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sms_relay} -d ${POSTGRES_DB:-sms_relay}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN in .env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?set ADMIN_USERNAME in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in .env}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?set DATA_ENCRYPTION_KEY in .env}
+      PLATFORM_VERSION: ${PLATFORM_VERSION:-1.1.0}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      RELAY_SITE: ${RELAY_SITE:-:80}
+      HTTP_PORT: ${HTTP_PORT:-80}
+      HTTPS_PORT: ${HTTPS_PORT:-443}
+      APP_PORT: ${APP_PORT:-39200}
+      RETENTION_DAYS: ${RETENTION_DAYS:-7}
+      RETENTION_INTERVAL_SECONDS: ${RETENTION_INTERVAL_SECONDS:-3600}
+      OTP_TTL_SECONDS: ${OTP_TTL_SECONDS:-1800}
+      CLAIMED_OTP_RETENTION_SECONDS: ${CLAIMED_OTP_RETENTION_SECONDS:-86400}
+      HMAC_SKEW_SECONDS: ${HMAC_SKEW_SECONDS:-300}
+      MQTT_BRIDGE_TOKEN: ${RELAY_MQTT_BRIDGE_TOKEN:-}
+      PYTHONUNBUFFERED: "1"
+    expose:
+      - "${APP_PORT:-39200}"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://localhost:'+os.environ.get('APP_PORT', '39200')+'/api/v1/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      # 冷启动要先跑 alembic upgrade head 再拉起 uvicorn，模型/路由较多时首启会明显变慢。
+      # 没有 start_period 时，6 次失败探测（约 60 秒）会把“还活着但启动慢”的实例判成
+      # unhealthy，让 `compose up -d` 直接报 dependency failed，从而误触发整个更新回滚。
+      start_period: 60s
+
+  mqtt-bridge:
+    profiles: ["mqtt"]
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    depends_on:
+      app:
+        condition: service_healthy
+    entrypoint: ["python", "-m", "app.mqtt_bridge"]
+    environment:
+      MQTT_BROKER_HOST: ${MQTT_BROKER_HOST:-}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT:-1883}
+      MQTT_CLIENT_ID: ${MQTT_CLIENT_ID:-sms-relay-mqtt-bridge-relay}
+      MQTT_TRANSPORT: ${MQTT_TRANSPORT:-tcp}
+      MQTT_WS_PATH: ${MQTT_WS_PATH:-/websocket}
+      MQTT_TOPIC_FILTER: ${MQTT_TOPIC_FILTER:-relay/v1/devices/+/messages}
+      MQTT_USERNAME: ${MQTT_USERNAME:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      MQTT_TLS: ${MQTT_TLS:-false}
+      RELAY_MQTT_INGEST_URL: ${RELAY_MQTT_INGEST_URL:-http://app:39200/api/v1/ingest/mqtt}
+      RELAY_MQTT_BRIDGE_TOKEN: ${RELAY_MQTT_BRIDGE_TOKEN:-}
+      PYTHONUNBUFFERED: "1"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.10-alpine
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      RELAY_SITE: ${RELAY_SITE:-:80}
+      RELAY_DOMAIN: ${RELAY_DOMAIN:-}
+      APP_PORT: ${APP_PORT:-39200}
+    command: ["/bin/sh", "/etc/caddy/caddy-entrypoint.sh"]
+    ports:
+      # TLS 由上游反代（宝塔 nginx）终结：Caddy 只保留 HTTP 监听作为反代上游，
+      # 443/QUIC 端口映射已移除（HTTPS_PORT 仍留在 .env 供运行时信息展示）。
+      - "${HTTP_PORT:-39300}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.domain:/etc/caddy/Caddyfile.domain:ro
+      - ./caddy-entrypoint.sh:/etc/caddy/caddy-entrypoint.sh:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

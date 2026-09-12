@@ -62,7 +62,7 @@ Append to `.gitignore`: `ios-shortcut/config.local.json` and `*.shortcut`; `debu
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildPayload } = require('../build-payload');
-const input = { sender: 'SMS Relay Test', body: 'Your verification code is 482731', messageDate: '2026-08-15T01:02:03Z', receivedAt: '2026-08-15T09:02:05+08:00' };
+const input = { sender: 'Authorized Relay Test', body: 'Your relay access code is 482731', messageDate: '2026-08-15T01:02:03Z', receivedAt: '2026-08-15T09:02:05+08:00' };
 test('builds the iOS schema deterministically', () => {
   const a = buildPayload(input); const b = buildPayload(input);
   assert.deepEqual(a, b); assert.equal(a.schema_version, 1);
@@ -153,7 +153,7 @@ $clientId = "ios-shortcut-smoke:$([guid]::NewGuid())"
 - Create: `ios-shortcut/VALIDATION.md`
 - Modify: `ios-shortcut/README.md`
 
-- [ ] **Step 1: Write a real-device checklist requiring a trusted HTTPS deployment, an enrolled test-device token, manual Shortcut execution with sender `SMS Relay Hub Manual Test` and body `Your verification code is 482731`, and dashboard confirmation that one message and one available OTP were created.**
+- [ ] **Step 1: Write a real-device checklist requiring a trusted HTTPS deployment, an enrolled test-device token, manual Shortcut execution with sender `Authorized Relay Test` and body `Your relay access code is 482731`, and dashboard confirmation that one message and one available access code were created.**
 - [ ] **Step 2: Require a real Messages automation test from an authorized sender, including foreground and locked-screen observations; expected backend result is one accepted message, while any system confirmation prompt is recorded as an iOS limitation rather than hidden.**
 - [ ] **Step 3: Require failure-path checks:** disable network and confirm visible failure with no claimed durable retry; rotate token and confirm old-token `401` before updating the Shortcut; delete the test device and confirm current-token `401`.
 - [ ] **Step 4: State that screenshots, console exports, and temporary payload captures belong only under `debug/ios-shortcut/`, must redact sender/body/OTP/token, and must not be committed.**

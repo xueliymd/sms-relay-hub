@@ -1,0 +1,24 @@
+#!/system/bin/sh
+
+set -u
+umask 077
+
+INOTIFYD=${SMS_RELAY_INOTIFYD:-/system/bin/inotifyd}
+WAKE_HELPER=${SMS_RELAY_WAKE_HELPER:-/system/bin/sms-relay-wake}
+TELEPHONY_DIRS=${SMS_RELAY_TELEPHONY_DIRS:-"/data/user/${SMS_RELAY_ANDROID_USER_ID:-0}/com.android.providers.telephony/databases /data/data/com.android.providers.telephony/databases /data/user_de/${SMS_RELAY_ANDROID_USER_ID:-0}/com.android.providers.telephony/databases"}
+
+[ -x "$INOTIFYD" ] || exit 0
+[ -x "$WAKE_HELPER" ] || exit 0
+
+set --
+for directory in $TELEPHONY_DIRS; do
+    [ -d "$directory" ] || continue
+    set -- "$@" "$directory:cwnmDdy"
+    for database_file in mmssms.db mmssms.db-wal mmssms.db-shm sms.db sms.db-wal sms.db-shm; do
+        [ -f "$directory/$database_file" ] || continue
+        set -- "$@" "$directory/$database_file:wn"
+    done
+done
+
+[ "$#" -gt 0 ] || exit 0
+exec "$INOTIFYD" "$WAKE_HELPER" "$@"

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "canonicalization": "timestamp\\nnonce\\nsha256(raw_body)",
+  "vectors": [
+    {
+      "name": "root_module_fixture_v1",
+      "adapter": "root_module",
+      "device_id": "00000000-0000-4000-8000-000000000001",
+      "source": "root_module",
+      "timestamp": "1786883696",
+      "nonce": "root-module-vector-nonce-20260816",
+      "idempotency_key": "root-module-vector-message-0001",
+      "body_file": "clients/root-module/tests/fixtures/message.json",
+      "body_sha256": "5401bf98eb658b87273e66d2cfcc0613704301ba56ac8278b04b8ab2331c4f57",
+      "secret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "signature": "wRuhc6pT3HQ9l_OjOdOqiqYRPREprqlFnPDx219l_H0"
+    },
+    {
+      "name": "ve_tweak_fixture_v1",
+      "adapter": "ve_tweak",
+      "device_id": "00000000-0000-4000-8000-000000000002",
+      "source": "ve_tweak",
+      "timestamp": "1786883696",
+      "nonce": "ve-tweak-vector-nonce-20260816",
+      "idempotency_key": "ve-tweak-vector-message-0001",
+      "body_file": "clients/ve-tweak/tests/fixtures/message.json",
+      "body_sha256": "a66400c65a1c895a63100577b12cb03e25167fe9b21f859abada222662d320a4",
+      "secret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "signature": "annhtScHRuK5KO5HeuKQT_KsOghWUH6_kpOXtMbt-BY"
+    }
+  ]
+}

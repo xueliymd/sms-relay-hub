@@ -1,0 +1,15 @@
+#!/system/bin/sh
+
+set -u
+umask 077
+
+STATE_DIR=${SMS_RELAY_STATE_DIR:-/data/adb/sms-relay}
+RUN_DIR=$STATE_DIR/run
+mkdir -p "$RUN_DIR" >/dev/null 2>&1 || exit 1
+: > "$RUN_DIR/telephony.changed" || exit 1
+chmod 600 "$RUN_DIR/telephony.changed" >/dev/null 2>&1 || exit 1
+worker_pid=$(cat "$RUN_DIR/worker.pid" 2>/dev/null || true)
+case "$worker_pid" in
+    ''|*[!0-9]*) ;;
+    *) kill -USR1 "$worker_pid" >/dev/null 2>&1 || true ;;
+esac

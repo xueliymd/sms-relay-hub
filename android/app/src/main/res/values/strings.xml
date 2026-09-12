@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_keep_alive_description">仅用于维持 Relay 后台转发服务，不读取页面内容</string>
+</resources>

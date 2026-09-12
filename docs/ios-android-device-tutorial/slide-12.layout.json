@@ -1,0 +1,930 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/8f2psfyx",
+    "id": "8f2psfyx",
+    "slide": 12,
+    "layoutId": "/ppt/slideLayouts/slideLayout1.xml",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "Calibri Light",
+        "eastAsianTypeface": "Calibri Light",
+        "complexScriptTypeface": "Calibri Light"
+      },
+      "minorFont": {
+        "latinTypeface": "Calibri",
+        "eastAsianTypeface": "Calibri",
+        "complexScriptTypeface": "Calibri"
+      }
+    },
+    "typefaces": [
+      "Calibri",
+      "Calibri Light"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout1.xml",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gj25cry9",
+      "id": "21",
+      "bbox": [
+        72,
+        40,
+        400,
+        24
+      ],
+      "geometry": "rect",
+      "text": "SMS RELAY HUB",
+      "textPreview": "SMS RELAY HUB",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SMS RELAY HUB"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SMS RELAY HUB",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SMS RELAY HUB",
+              "fontSize": 12,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1gbm9s3a",
+      "id": "2",
+      "bbox": [
+        72,
+        72,
+        1030,
+        58
+      ],
+      "geometry": "rect",
+      "text": "最终验收清单：每台设备都留下可复核证据",
+      "textPreview": "最终验收清单：每台设备都留下可复核证据",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "最终验收清单：每台设备都留下可复核证据"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "最终验收清单：每台设备都留下可复核证据",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "最终验收清单：每台设备都留下可复核证据",
+              "fontSize": 36,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0f2lgnmp",
+      "id": "3",
+      "bbox": [
+        1160,
+        45,
+        48,
+        24
+      ],
+      "geometry": "rect",
+      "text": "12",
+      "textPreview": "12",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "12"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "12",
+          "resolvedTextStyle": {
+            "fontSize": 14,
+            "color": "#5E6A7D",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "12",
+              "fontSize": 14,
+              "color": "#5E6A7D",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ra943il8",
+      "id": "4",
+      "bbox": [
+        72,
+        144,
+        1136,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#C7CDD6",
+      "lineColor": "#C7CDD6",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/q903ad4n",
+      "id": "5",
+      "bbox": [
+        72,
+        198,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dcbm583y",
+      "id": "6",
+      "bbox": [
+        94,
+        190,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer",
+      "textPreview": "后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "后台设备类型和鉴权方式匹配：Android Root=hmac，iPhone 快捷指令=bearer",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sb2lcnmd",
+      "id": "7",
+      "bbox": [
+        72,
+        260,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/b6d4f2lc",
+      "id": "8",
+      "bbox": [
+        94,
+        252,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git",
+      "textPreview": "真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "真实凭据只保存到对应客户端，不进入截图、PPT、日志或 Git",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a543mx4r",
+      "id": "9",
+      "bbox": [
+        72,
+        322,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wvupgz6t",
+      "id": "10",
+      "bbox": [
+        94,
+        314,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "Android 安装当前模块包，并通过模块执行检查控制台和运行状态",
+      "textPreview": "Android 安装当前模块包，并通过模块执行检查控制台和运行状态",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Android 安装当前模块包，并通过模块执行检查控制台和运行状态"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Android 安装当前模块包，并通过模块执行检查控制台和运行状态",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Android 安装当前模块包，并通过模块执行检查控制台和运行状态",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xw3q94ne",
+      "id": "11",
+      "bbox": [
+        72,
+        384,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/atc7epon",
+      "id": "12",
+      "bbox": [
+        94,
+        376,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录",
+      "textPreview": "iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "iPhone 前台、锁屏、重复触发各完成一次，记录状态码和后台消息记录",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bulo7u58",
+      "id": "13",
+      "bbox": [
+        72,
+        446,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/orapcf6h",
+      "id": "14",
+      "bbox": [
+        94,
+        438,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过",
+      "textPreview": "服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "服务器 health、PostgreSQL backend、设备列表和一条脱敏消息 smoke 全部通过",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9sj65kn2",
+      "id": "15",
+      "bbox": [
+        72,
+        508,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mps7a5or",
+      "id": "16",
+      "bbox": [
+        94,
+        500,
+        1040,
+        70
+      ],
+      "geometry": "rect",
+      "text": "失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”",
+      "textPreview": "失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "失败时保留错误分类，不把“页面刷新成功”当作“短信已成功上传”",
+              "fontSize": 19,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nq1o3a5w",
+      "id": "17",
+      "bbox": [
+        72,
+        590,
+        1040,
+        3
+      ],
+      "geometry": "rect",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0nap8f6l",
+      "id": "18",
+      "bbox": [
+        72,
+        612,
+        1040,
+        32
+      ],
+      "geometry": "rect",
+      "text": "完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。",
+      "textPreview": "完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。",
+          "resolvedTextStyle": {
+            "fontSize": 22,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "完成标准：客户端触发 -> 服务端接受 -> 后台消息可见，三段链路都能对上。",
+              "fontSize": 22,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1oj61kn6",
+      "id": "19",
+      "bbox": [
+        72,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "教程与控制台设备页同步 · 后续再扩展 APK/app",
+      "textPreview": "教程与控制台设备页同步 · 后续再扩展 APK/app",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "教程与控制台设备页同步 · 后续再扩展 APK/app"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "教程与控制台设备页同步 · 后续再扩展 APK/app",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#5E6A7D"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "教程与控制台设备页同步 · 后续再扩展 APK/app",
+              "fontSize": 11,
+              "color": "#5E6A7D"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hkbm5wzu",
+      "id": "20",
+      "bbox": [
+        1060,
+        680,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Relay Hub",
+      "textPreview": "Relay Hub",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Relay Hub"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Relay Hub",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#2357C6",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Relay Hub",
+              "fontSize": 11,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

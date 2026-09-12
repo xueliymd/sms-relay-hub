@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "client_message_id": "root-module-vector-message-0001",
+  "received_at": "2026-08-16T12:34:56.000Z",
+  "sender": "Fixture Sender",
+  "body": "Integration fixture code 482731",
+  "source": "root_module",
+  "metadata": {
+    "client_version": "root-module-fixture-v1",
+    "fixture": true
+  }
+}

@@ -1,0 +1,1101 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/jetc3ut0",
+    "id": "jetc3ut0",
+    "slide": 11,
+    "layoutId": "/ppt/slideLayouts/slideLayout1.xml",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "Calibri Light",
+        "eastAsianTypeface": "Calibri Light",
+        "complexScriptTypeface": "Calibri Light"
+      },
+      "minorFont": {
+        "latinTypeface": "Calibri",
+        "eastAsianTypeface": "Calibri",
+        "complexScriptTypeface": "Calibri"
+      }
+    },
+    "typefaces": [
+      "Calibri",
+      "Calibri Light"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout1.xml",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7650nq5s",
+      "id": "22",
+      "bbox": [
+        72,
+        40,
+        400,
+        24
+      ],
+      "geometry": "rect",
+      "text": "SMS RELAY HUB",
+      "textPreview": "SMS RELAY HUB",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SMS RELAY HUB"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SMS RELAY HUB",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SMS RELAY HUB",
+              "fontSize": 12,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xcryxg7y",
+      "id": "2",
+      "bbox": [
+        72,
+        72,
+        1030,
+        58
+      ],
+      "geometry": "rect",
+      "text": "服务器部署是全新生产库，不会带入本机测试数据",
+      "textPreview": "服务器部署是全新生产库，不会带入本机测试数据",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "服务器部署是全新生产库，不会带入本机测试数据"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "服务器部署是全新生产库，不会带入本机测试数据",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "服务器部署是全新生产库，不会带入本机测试数据",
+              "fontSize": 36,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wbih4b6d",
+      "id": "3",
+      "bbox": [
+        1160,
+        45,
+        48,
+        24
+      ],
+      "geometry": "rect",
+      "text": "11",
+      "textPreview": "11",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "11"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "11",
+          "resolvedTextStyle": {
+            "fontSize": 14,
+            "color": "#5E6A7D",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "11",
+              "fontSize": 14,
+              "color": "#5E6A7D",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/n69grmpw",
+      "id": "4",
+      "bbox": [
+        72,
+        144,
+        1136,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#C7CDD6",
+      "lineColor": "#C7CDD6",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/250zy18b",
+      "id": "5",
+      "bbox": [
+        72,
+        184,
+        360,
+        28
+      ],
+      "geometry": "rect",
+      "text": "Docker Compose 部署",
+      "textPreview": "Docker Compose 部署",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Docker Compose 部署"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Docker Compose 部署",
+          "resolvedTextStyle": {
+            "fontSize": 22,
+            "color": "#2357C6",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Docker Compose 部署",
+              "fontSize": 22,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/98rytw72",
+      "id": "6",
+      "bbox": [
+        72,
+        236,
+        510,
+        130
+      ],
+      "geometry": "rect",
+      "fillColor": "#F1F3F6",
+      "lineColor": "#C7CDD6",
+      "lineWidth": 1
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/o7ih0r6h",
+      "id": "7",
+      "bbox": [
+        88,
+        250,
+        478,
+        102
+      ],
+      "geometry": "rect",
+      "text": "docker compose --env-file deploy/.env \\\n  -f deploy/compose.yml up --build -d\ndocker compose --env-file deploy/.env \\\n  -f deploy/compose.yml ps",
+      "textPreview": "docker compose --env-file deploy/.env \\ |   -f deploy/compose.yml up --build -d | docker compose --env-file deploy/.env \\ |   -f deploy/c...",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "docker compose --env-file deploy/.env \\"
+          },
+          {
+            "index": 2,
+            "text": "  -f deploy/compose.yml up --build -d"
+          },
+          {
+            "index": 3,
+            "text": "docker compose --env-file deploy/.env \\"
+          },
+          {
+            "index": 4,
+            "text": "  -f deploy/compose.yml ps"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "docker compose --env-file deploy/.env \\",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#284A86"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "docker compose --env-file deploy/.env \\",
+              "fontSize": 16,
+              "color": "#284A86"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "  -f deploy/compose.yml up --build -d",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#284A86"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "  -f deploy/compose.yml up --build -d",
+              "fontSize": 16,
+              "color": "#284A86"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        },
+        {
+          "index": 3,
+          "text": "docker compose --env-file deploy/.env \\",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#284A86"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "docker compose --env-file deploy/.env \\",
+              "fontSize": 16,
+              "color": "#284A86"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        },
+        {
+          "index": 4,
+          "text": "  -f deploy/compose.yml ps",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#284A86"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "  -f deploy/compose.yml ps",
+              "fontSize": 16,
+              "color": "#284A86"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/72t03qp0",
+      "id": "8",
+      "bbox": [
+        660,
+        184,
+        260,
+        28
+      ],
+      "geometry": "rect",
+      "text": "部署检查",
+      "textPreview": "部署检查",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "部署检查"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "部署检查",
+          "resolvedTextStyle": {
+            "fontSize": 22,
+            "color": "#172033",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "部署检查",
+              "fontSize": 22,
+              "color": "#172033",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/61kzalof",
+      "id": "9",
+      "bbox": [
+        660,
+        246,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ofqtgnyt",
+      "id": "10",
+      "bbox": [
+        682,
+        238,
+        480,
+        66
+      ],
+      "geometry": "rect",
+      "text": "/api/v1/health 返回可用",
+      "textPreview": "/api/v1/health 返回可用",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "/api/v1/health 返回可用"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "/api/v1/health 返回可用",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "/api/v1/health 返回可用",
+              "fontSize": 18,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9gza9sze",
+      "id": "11",
+      "bbox": [
+        660,
+        304,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mdobedg3",
+      "id": "12",
+      "bbox": [
+        682,
+        296,
+        480,
+        66
+      ],
+      "geometry": "rect",
+      "text": "后台 runtime 的 database_backend = postgresql",
+      "textPreview": "后台 runtime 的 database_backend = postgresql",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "后台 runtime 的 database_backend = postgresql"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "后台 runtime 的 database_backend = postgresql",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "后台 runtime 的 database_backend = postgresql",
+              "fontSize": 18,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nehs7iho",
+      "id": "13",
+      "bbox": [
+        660,
+        362,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0b6tc3yx",
+      "id": "14",
+      "bbox": [
+        682,
+        354,
+        480,
+        66
+      ],
+      "geometry": "rect",
+      "text": "PostgreSQL 使用命名卷 postgres_data",
+      "textPreview": "PostgreSQL 使用命名卷 postgres_data",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "PostgreSQL 使用命名卷 postgres_data"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "PostgreSQL 使用命名卷 postgres_data",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "PostgreSQL 使用命名卷 postgres_data",
+              "fontSize": 18,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1cfa58zi",
+      "id": "15",
+      "bbox": [
+        660,
+        420,
+        8,
+        8
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2357C6",
+      "lineColor": "#2357C6",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/epobatgr",
+      "id": "16",
+      "bbox": [
+        682,
+        412,
+        480,
+        66
+      ],
+      "geometry": "rect",
+      "text": "不会读取工作区 relay-dev-live.db 或客户端本地队列",
+      "textPreview": "不会读取工作区 relay-dev-live.db 或客户端本地队列",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "不会读取工作区 relay-dev-live.db 或客户端本地队列"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "不会读取工作区 relay-dev-live.db 或客户端本地队列",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "不会读取工作区 relay-dev-live.db 或客户端本地队列",
+              "fontSize": 18,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zaxs3yhc",
+      "id": "17",
+      "bbox": [
+        72,
+        500,
+        1040,
+        108
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFF7E7",
+      "lineColor": "#875208",
+      "lineWidth": 1
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cn6t83y1",
+      "id": "18",
+      "bbox": [
+        88,
+        513,
+        1008,
+        24
+      ],
+      "geometry": "rect",
+      "text": "当前限制",
+      "textPreview": "当前限制",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "当前限制"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "当前限制",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#875208",
+            "bold": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "当前限制",
+              "fontSize": 16,
+              "color": "#875208",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dofa18z6",
+      "id": "19",
+      "bbox": [
+        88,
+        544,
+        1008,
+        50
+      ],
+      "geometry": "rect",
+      "text": "开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。",
+      "textPreview": "开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#172033"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "开发机没有 Docker，真实 PostgreSQL/Caddy/HTTPS smoke 必须在 Debian 12 服务器执行。",
+              "fontSize": 15,
+              "color": "#172033"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tsnip0ny",
+      "id": "20",
+      "bbox": [
+        72,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "第一版部署教程 · 示例值均为占位符",
+      "textPreview": "第一版部署教程 · 示例值均为占位符",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第一版部署教程 · 示例值均为占位符"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第一版部署教程 · 示例值均为占位符",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#5E6A7D"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "第一版部署教程 · 示例值均为占位符",
+              "fontSize": 11,
+              "color": "#5E6A7D"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/87ehgv6d",
+      "id": "21",
+      "bbox": [
+        1060,
+        680,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Relay Hub",
+      "textPreview": "Relay Hub",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Relay Hub"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Relay Hub",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#2357C6",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Relay Hub",
+              "fontSize": 11,
+              "color": "#2357C6",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "client_message_id": "ve-tweak-vector-message-0001",
+  "received_at": "2026-08-16T12:34:56.000Z",
+  "sender": "Fixture Sender",
+  "body": "Integration fixture code 735190",
+  "source": "ve_tweak",
+  "metadata": {
+    "client_version": "ve-tweak-fixture-v1",
+    "fixture": true
+  }
+}

@@ -1,0 +1,6 @@
+id=sms-relay-root
+name=SMS Relay Root Adapter
+version=0.3.10
+versionCode=22
+author=SMS Relay Hub
+description=SQLite-first Root SMS relay with QR enrollment, WS or MQTT transport, HTTP fallback, and database diagnostics for Magisk, KernelSU, and APatch

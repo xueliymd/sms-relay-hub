@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "enabled": false,
+  "base_url": "https://relay.example.invalid",
+  "allow_insecure_local_http": false,
+  "transport_mode": "http",
+  "fallback_to_http": true,
+  "mqtt_broker_url": "",
+  "mqtt_topic": "",
+  "mqtt_username": "",
+  "mqtt_password": "",
+  "device_id": "",
+  "hmac_secret": "",
+  "source": "root_module",
+  "android_user_id": 0,
+  "initial_sync_mode": "new_only",
+  "poll_interval_seconds": 3,
+  "watcher_idle_seconds": 1,
+  "max_backoff_seconds": 300,
+  "sms_database_path": ""
+}

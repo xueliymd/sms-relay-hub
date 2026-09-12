@@ -10,6 +10,13 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115,<1.0",
     "uvicorn[standard]>=0.34,<1.0",
+    "pydantic-settings>=2.7,<3.0",
+    "cryptography>=44,<46",
+    "argon2-cffi>=23.1,<26",
+    "alembic>=1.15,<2.0",
+    "psycopg[binary]>=3.2,<4.0",
+    "sqlalchemy>=2.0,<3.0",
+    "paho-mqtt>=2.1,<3.0",
 ]
 
 [project.optional-dependencies]
@@ -18,6 +25,7 @@ dev = [
     "mypy>=1.15,<2.0",
     "pytest>=8.3,<9.0",
     "ruff>=0.11,<1.0",
+    "testcontainers[postgres]>=4.10,<5.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -32,8 +40,9 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+ignore = ["E501", "UP017"]
 
 [tool.mypy]
 python_version = "3.12"
+mypy_path = ".."
 strict = true
-

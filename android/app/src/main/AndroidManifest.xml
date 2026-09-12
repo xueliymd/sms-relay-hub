@@ -1,0 +1,118 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-feature android:name="android.hardware.camera" android:required="false" />
+  <uses-permission android:name="android.permission.RECEIVE_SMS" />
+  <!-- 远程控制 query_recent_sms 指令需要；未授权时该指令回传说明而不读取任何数据 -->
+  <uses-permission android:name="android.permission.READ_SMS" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <!-- 系统级权限：需 ADB 授予后，应用才能程序化开启/重启无障碍保活（对齐 GKD） -->
+  <uses-permission
+      android:name="android.permission.WRITE_SECURE_SETTINGS"
+      tools:ignore="ProtectedPermissions" />
+  <uses-feature android:name="android.hardware.telephony" android:required="false" />
+  <application
+      android:name=".RelayApplication"
+      android:allowBackup="false"
+      android:label="Relay短信转发"
+      android:supportsRtl="true"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="true">
+    <activity android:name=".MainActivity" android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <!--
+        长按通知栏磁贴时的落点。
+        系统对 TileService 的默认行为是"长按 → 应用详情页"；只有显式声明
+        带 ACTION_QS_TILE_PREFERENCES 的 Activity 才会改为打开本应用。
+        （AOSP: android.service.quicksettings.TileService.ACTION_QS_TILE_PREFERENCES）
+      -->
+      <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+      </intent-filter>
+    </activity>
+    <service
+        android:name=".SmsRelayForegroundService"
+        android:exported="false"
+        android:foregroundServiceType="specialUse">
+      <!--
+        specialUse：常驻监听类前台服务的正确类型（对齐 GKD StatusService）。
+        dataSync 在 Android 15 起有 6 小时/24 小时运行预算，超时系统强制停服务；
+        specialUse 无此时限，适合"常驻等待短信"这种核心业务场景。
+      -->
+      <property
+          android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+          android:value="保持后台运行以实时接收短信并立即上报" />
+    </service>
+    <service
+        android:name=".RelayTileService"
+        android:exported="true"
+        android:label="Relay短信转发"
+        android:icon="@drawable/ic_relay_tile"
+        android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+      <!--
+        TOGGLEABLE_TILE：声明本磁贴是"两种状态的开关"，系统才会按 active/inactive
+        两态渲染并允许切换。GKD 的全部开关型磁贴（GkdTileService / HttpTileService 等）
+        都声明了这一项。
+        注意刻意**不加** ACTIVE_TILE —— 那会把磁贴改成"按住才生效"的常驻绑定语义，
+        必须配合 requestListeningState 使用，否则状态更不刷新；GKD 也没有使用它。
+      -->
+      <meta-data
+          android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+          android:value="true" />
+      <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+      </intent-filter>
+    </service>
+    <service
+        android:name=".RelayKeepAliveAccessibilityService"
+        android:exported="true"
+        android:label="Relay 可选保活辅助服务"
+        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+      <intent-filter>
+        <action android:name="android.accessibilityservice.AccessibilityService" />
+      </intent-filter>
+      <meta-data
+          android:name="android.accessibilityservice"
+          android:resource="@xml/accessibility_keep_alive_service" />
+    </service>
+    <receiver
+        android:name=".BootReceiver"
+        android:enabled="true"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+      </intent-filter>
+    </receiver>
+    <receiver
+        android:name=".SmsReceivedReceiver"
+        android:exported="true"
+        android:permission="android.permission.BROADCAST_SMS">
+      <intent-filter android:priority="500">
+        <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+      </intent-filter>
+    </receiver>
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.updates"
+        android:exported="false"
+        android:grantUriPermissions="true">
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/update_file_paths" />
+    </provider>
+  </application>
+</manifest>
