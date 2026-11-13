@@ -10,9 +10,9 @@ class BaseUrlTest {
     @Test
     fun normalizesSupportedHttpAndHttpsOrigins() {
         assertEquals("https://sms.example.com", BaseUrl.parse("https://sms.example.com/").value)
-        assertEquals("http://111.119.250.86:39300", BaseUrl.parse("http://111.119.250.86:39300").value)
+        assertEquals("http://203.0.113.10:39300", BaseUrl.parse("http://203.0.113.10:39300").value)
         assertTrue(BaseUrl.parse("https://sms.example.com").secure)
-        assertFalse(BaseUrl.parse("http://111.119.250.86:39300").secure)
+        assertFalse(BaseUrl.parse("http://203.0.113.10:39300").secure)
     }
 
     @Test

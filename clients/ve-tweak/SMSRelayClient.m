@@ -149,6 +149,15 @@ static void SMSRelayAppendLengthPrefixedData(NSMutableData *target, NSData *data
     return client;
 }
 
++ (BOOL)isEnabled {
+    NSDictionary *preferences = SMSRelayReadPreferences();
+    id enabled = preferences[kSMSRelayEnabledKey];
+    return [preferences isKindOfClass:[NSDictionary class]] &&
+        [enabled isKindOfClass:[NSNumber class]] &&
+        CFGetTypeID((__bridge CFTypeRef)enabled) == CFBooleanGetTypeID() &&
+        enabled.boolValue;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self != nil) {

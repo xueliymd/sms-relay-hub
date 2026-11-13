@@ -641,6 +641,45 @@ def test_hmac_nonce_replay_is_rejected_after_persistence(client: TestClient) -> 
     assert client.post("/api/v1/ingest/messages", content=raw, headers=headers).status_code == 401
 
 
+def test_ve_tweak_hmac_ingest_uses_the_dedicated_source_contract(
+    client: TestClient,
+) -> None:
+    created = create_device(client, client_type="ve_tweak", auth_kind="hmac")
+    device_id = created["device"]["id"]
+    secret = created["credential"]["secret"]
+    data = relay_payload("ve-event-1", body="Your verification code is 482731", source="ve_tweak")
+    raw, headers = hmac_request(device_id, secret, data, nonce="ve-tweak-nonce-1")
+
+    response = client.post("/api/v1/ingest/messages", content=raw, headers=headers)
+
+    assert response.status_code == 201
+    listed = client.get("/api/v1/admin/messages", headers=ADMIN_HEADERS)
+    assert listed.status_code == 200
+    assert listed.json()[0]["device_id"] == device_id
+    assert listed.json()[0]["source"] == "ve_tweak"
+    assert listed.json()[0]["client_message_id"] == "ve-event-1"
+
+
+def test_ve_tweak_rejects_a_source_from_another_device_contract(
+    client: TestClient,
+) -> None:
+    created = create_device(client, client_type="ve_tweak", auth_kind="hmac")
+    device_id = created["device"]["id"]
+    data = relay_payload("ve-event-wrong-source", source="android_app")
+    raw, headers = hmac_request(
+        device_id,
+        created["credential"]["secret"],
+        data,
+        nonce="ve-tweak-wrong-source-nonce",
+    )
+
+    response = client.post("/api/v1/ingest/messages", content=raw, headers=headers)
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "invalid_message"
+    assert client.get("/api/v1/admin/messages", headers=ADMIN_HEADERS).json() == []
+
+
 @pytest.mark.parametrize("mutation", ["revoke", "restore", "purge"])
 def test_hmac_ingest_cannot_persist_after_lifecycle_mutation(
     client: TestClient,
@@ -2479,8 +2518,8 @@ def test_legacy_unnormalized_sim_binding_is_reported_in_e164_form(
 ) -> None:
     created = create_device(client, client_type="root_module", auth_kind="hmac")
     device_id = created["device"]["id"]
-    put_sim_profile(client, device_id, 0, subscription_id=None, phone_number="18056080249")
-    _rewrite_profile_phone_ciphertext(device_id, 0, "18056080249")
+    put_sim_profile(client, device_id, 0, subscription_id=None, phone_number="13800138000")
+    _rewrite_profile_phone_ciphertext(device_id, 0, "13800138000")
 
     ingest_root_message(
         client,
@@ -2492,7 +2531,7 @@ def test_legacy_unnormalized_sim_binding_is_reported_in_e164_form(
 
     listed = client.get(
         "/api/v1/admin/messages",
-        params={"phone_number": "+8618056080249"},
+        params={"phone_number": "+8613800138000"},
         headers=ADMIN_HEADERS,
     )
     assert listed.status_code == 200

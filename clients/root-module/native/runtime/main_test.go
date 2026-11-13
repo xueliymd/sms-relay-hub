@@ -287,7 +287,7 @@ func TestValidateConfigAllowsIPHTTPSAndPrivateOptInCleartextHTTP(t *testing.T) {
 	}
 
 	for _, url := range []string{
-		"http://111.119.250.86:39300",
+		"http://203.0.113.10:39300",
 		"http://relay.example:39300",
 		"http://127.0.0.1",
 	} {

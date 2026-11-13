@@ -1,0 +1,99 @@
+diff --git a/Tweak/Core/Makefile b/Tweak/Core/Makefile
+index 0f28e76..fce7c34 100644
+--- a/Tweak/Core/Makefile
++++ b/Tweak/Core/Makefile
+@@ -1,7 +1,7 @@
+ TWEAK_NAME = VeCore
+ VeCore_FILES = VeCore.m $(wildcard ../../Manager/*.m ../../Utils/*.m)
+ VeCore_CFLAGS = -fobjc-arc
+-VeCore_FRAMEWORKS = UIKit
++VeCore_FRAMEWORKS = UIKit Security
+ 
+ include $(THEOS)/makefiles/common.mk
+ include $(THEOS_MAKE_PATH)/tweak.mk
+diff --git a/Tweak/Core/VeCore.m b/Tweak/Core/VeCore.m
+index 46f6347..753d2d3 100644
+--- a/Tweak/Core/VeCore.m
++++ b/Tweak/Core/VeCore.m
+@@ -10,6 +10,7 @@
+ #import "../../Manager/LogManager.h"
+ #import "../../Manager/BarkManager.h"
+ #import "../../Manager/VEAIManager.h"
++#import "../../Manager/SMSRelayClient.h"
+ #import "../../Preferences/PreferenceKeys.h"
+ #import "../../Preferences/NotificationKeys.h"
+ #import "../../PrivateHeaders.h"
+@@ -26,11 +27,55 @@ static void (* orig_BBServer_publishBulletin_destinations)(BBServer* self, SEL _
+ static void override_BBServer_publishBulletin_destinations(BBServer* self, SEL _cmd, BBBulletin* bulletin, unsigned long long destinations) {
+ 	orig_BBServer_publishBulletin_destinations(self, _cmd, bulletin, destinations);
+ 
+-	if ([pfBlockedSenders containsObject:[bulletin sectionID]]) {
++	NSString *sectionID = nil;
++	if ([bulletin respondsToSelector:@selector(sectionID)]) {
++		id sectionValue = [bulletin sectionID];
++		if ([sectionValue isKindOfClass:[NSString class]]) {
++			sectionID = [sectionValue copy];
++		}
++	}
++
++	// SMS Relay is intentionally independent of Ve's logging switch. It only
++	// accepts Apple's Messages bundle and sends a minimal redacted payload.
++	if ([sectionID isEqualToString:@"com.apple.MobileSMS"] && [SMSRelayClient isEnabled]) {
++		NSString *sender = nil;
++		if ([bulletin respondsToSelector:@selector(title)]) {
++			id senderValue = [bulletin title];
++			if ([senderValue isKindOfClass:[NSString class]]) sender = [senderValue copy];
++		}
++
++		NSString *body = nil;
++		if ([bulletin respondsToSelector:@selector(message)]) {
++			id bodyValue = [bulletin message];
++			if ([bodyValue isKindOfClass:[NSString class]]) body = [bodyValue copy];
++		}
++
++		NSDate *notificationDate = nil;
++		if ([bulletin respondsToSelector:@selector(publicationDate)]) {
++			id publicationDateValue = [bulletin publicationDate];
++			if ([publicationDateValue isKindOfClass:[NSDate class]]) notificationDate = publicationDateValue;
++		}
++		if (notificationDate == nil && [bulletin respondsToSelector:@selector(date)]) {
++			id dateValue = [bulletin date];
++			if ([dateValue isKindOfClass:[NSDate class]]) notificationDate = dateValue;
++		}
++
++		if (sender.length > 0 && body.length > 0 && notificationDate != nil) {
++			[[SMSRelayClient sharedClient] relayMessageFromSender:sender body:body date:notificationDate];
++		}
++	}
++
++	// When Ve logging is disabled, the hook remains installed only to service
++	// the optional SMS Relay channel.
++	if (!pfEnabled) {
+ 		return;
+ 	}
+ 
+-	if (![bulletin sectionID]) {
++	if (sectionID == nil || [pfBlockedSenders containsObject:sectionID]) {
++		return;
++	}
++
++	if (sectionID.length == 0) {
+ 		return;
+ 	}
+ 
+@@ -107,9 +152,12 @@ static void load_preferences() {
+ __attribute((constructor)) static void initialize() {
+ 	load_preferences();
+ 
+-    if (!pfEnabled) {
+-        return;
+-    }
++	// Ve logging and SMS Relay have separate switches. Install the hook when
++	// either channel is enabled; the callback gates each channel separately.
++	BOOL smsRelayEnabled = [SMSRelayClient isEnabled];
++	if (!pfEnabled && !smsRelayEnabled) {
++		return;
++	}
+ 
+ 	MSHookMessageEx(NSClassFromString(@"BBServer"), @selector(publishBulletin:destinations:), (IMP)&override_BBServer_publishBulletin_destinations, (IMP *)&orig_BBServer_publishBulletin_destinations);
+ 

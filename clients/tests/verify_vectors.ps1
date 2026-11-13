@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$RepositoryRoot,
     [string]$VectorPath
@@ -844,7 +844,10 @@ $veRelativeFiles = @(
     'clients/ve-tweak/SMSRelayClient.m',
     'clients/ve-tweak/VeSMSRelay.xm',
     'clients/ve-tweak/Makefile',
-    'clients/ve-tweak/README.md'
+    'clients/ve-tweak/README.md',
+    'clients/ve-tweak/COPYING',
+    'clients/ve-tweak/patches/README.md',
+    'clients/ve-tweak/patches/ve-core-2.3.4-sms-relay.patch'
 )
 foreach ($relativePath in $veRelativeFiles) {
     $path = Join-Path $RepositoryRoot $relativePath
@@ -859,8 +862,11 @@ $veClientText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $Reposit
 $veHookText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $RepositoryRoot 'clients/ve-tweak/VeSMSRelay.xm')
 $veMakefileText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $RepositoryRoot 'clients/ve-tweak/Makefile')
 $veReadmeText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $RepositoryRoot 'clients/ve-tweak/README.md')
+$veIntegrationPatchText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $RepositoryRoot 'clients/ve-tweak/patches/ve-core-2.3.4-sms-relay.patch')
+$veIntegrationReadmeText = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $RepositoryRoot 'clients/ve-tweak/patches/README.md')
 
 Assert-Contains -Label 'Ve public shared client' -Text $veHeaderText -Pattern '\+\s*\(instancetype\)sharedClient'
+Assert-Contains -Label 'Ve public enabled probe' -Text $veHeaderText -Pattern '\+\s*\(BOOL\)isEnabled'
 Assert-Contains -Label 'Ve public relay method' -Text $veHeaderText -Pattern 'relayMessageFromSender:\s*\(NSString\s*\*\)sender\s+body:\s*\(NSString\s*\*\)body\s+date:\s*\(NSDate\s*\*\)date'
 Assert-Contains -Label 'Ve Foundation import' -Text $veClientText -Pattern '#import\s+<Foundation/Foundation\.h>'
 Assert-Contains -Label 'Ve CommonDigest import' -Text $veClientText -Pattern '#import\s+<CommonCrypto/CommonDigest\.h>'
@@ -1051,6 +1057,22 @@ Assert-Contains -Label 'Ve README external acceptance' -Text $veReadmeText -Patt
 Assert-Contains -Label 'Ve README real iPhone boundary' -Text $veReadmeText -Pattern '(?i)real iPhone'
 Assert-Contains -Label 'Ve README injection boundary' -Text $veReadmeText -Pattern '(?i)injection|selector'
 Assert-Contains -Label 'Ve README network boundary' -Text $veReadmeText -Pattern '(?i)real network'
+Assert-Contains -Label 'Ve README integrated baseline' -Text $veReadmeText -Pattern 'a69204defc3e7fb6b14638f32dc8225807655aa9'
+Assert-Contains -Label 'Ve README exclusive deployment warning' -Text $veReadmeText -Pattern '(?i)never both|do not install both|mutually exclusive'
+Assert-Contains -Label 'Ve README full capture privacy warning' -Text $veReadmeText -Pattern '(?i)full API|unredacted'
+
+Assert-Contains -Label 'Ve integration target commit' -Text $veIntegrationReadmeText -Pattern 'a69204defc3e7fb6b14638f32dc8225807655aa9'
+Assert-Contains -Label 'Ve integration GPL notice' -Text $veIntegrationReadmeText -Pattern '(?i)GPL-3\.0'
+Assert-Contains -Label 'Ve integration exact apply command' -Text $veIntegrationReadmeText -Pattern 'git apply'
+Assert-Contains -Label 'Ve integration copy client header' -Text $veIntegrationReadmeText -Pattern 'SMSRelayClient\.h'
+Assert-Contains -Label 'Ve integration copy client source' -Text $veIntegrationReadmeText -Pattern 'SMSRelayClient\.m'
+Assert-Contains -Label 'Ve integration no double hook' -Text $veIntegrationReadmeText -Pattern '(?i)never both|double-process'
+Assert-Contains -Label 'Ve patch client import' -Text $veIntegrationPatchText -Pattern '#import\s+"\.\./\.\./Manager/SMSRelayClient\.h"'
+Assert-Contains -Label 'Ve patch Security framework' -Text $veIntegrationPatchText -Pattern 'VeCore_FRAMEWORKS\s*=\s*UIKit\s+Security'
+Assert-Contains -Label 'Ve patch independent switch' -Text $veIntegrationPatchText -Pattern '!pfEnabled\s*&&\s*!smsRelayEnabled'
+Assert-Contains -Label 'Ve patch MobileSMS filter' -Text $veIntegrationPatchText -Pattern 'com\.apple\.MobileSMS'
+Assert-Contains -Label 'Ve patch selector guard' -Text $veIntegrationPatchText -Pattern 'respondsToSelector:@selector\(publicationDate\)'
+Assert-Contains -Label 'Ve patch date fallback' -Text $veIntegrationPatchText -Pattern 'notificationDate == nil.*respondsToSelector:@selector\(date\)'
 
 Write-Output "PASS ve_source_contract files=$($veRelativeFiles.Count) source=ve_tweak validation=static"
 Write-Output "PASS adapter entrypoints present; vectors=$vectorCount"

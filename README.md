@@ -1,6 +1,6 @@
 # SMS Relay Hub
 
-自托管的授权设备消息中转平台。Android 客户端监听本机新消息并通过 HMAC 上报；iPhone 使用“信息”个人自动化和快捷指令通过 Bearer 上报。服务端把敏感字段用 AES-256-GCM 加密后保存到 PostgreSQL，并提供一次性访问码 Claim API。
+自托管的授权设备消息中转平台。Android 与 Root 客户端通过 HMAC 上报；iPhone 可使用“信息”个人自动化/快捷指令（Bearer），也可通过 Ve 通知 Hook 客户端（HMAC）上报。服务端把敏感字段用 AES-256-GCM 加密后保存到 PostgreSQL，并提供一次性访问码 Claim API。
 
 ## 一键部署
 
@@ -35,7 +35,7 @@ docker compose -p deploy --env-file deploy/.env -f deploy/compose.yml up --build
 ## 已实现
 
 - FastAPI + SQLAlchemy + Alembic + PostgreSQL 16 持久化。
-- Android HMAC、iPhone Bearer、Root HTTP/WS/MQTT 上报、凭据轮换和设备撤销。
+- Android/Root/Ve HMAC、iPhone Bearer、Root HTTP/WS/MQTT 上报、凭据轮换和设备撤销。
 - HMAC 时间窗口与持久 nonce 防重放。
 - `(device_id, client_message_id)` 幂等约束；同请求重放返回 `200 duplicate=true`，同键异文返回 `409`。
 - 消息正文、发送方、metadata、HMAC 密钥和访问码字段级 AES-GCM 加密。
@@ -171,7 +171,8 @@ Root 模块默认使用 HTTP；也可在模块控制台选择 WebSocket 或 MQTT
 
 - Android：`android/README.md`、`android/docs/private-distribution.md`、`android/docs/real-device-validation.md`。
 - 会话接替审查报告：`docs/SESSION_01A06BD1_HANDOFF.md`。
-- iPhone：`ios-shortcut/README.md`、`ios-shortcut/shortcut-definition.md`、`ios-shortcut/VALIDATION.md`。
+- iPhone 快捷指令：`ios-shortcut/README.md`、`ios-shortcut/shortcut-definition.md`、`ios-shortcut/VALIDATION.md`。
+- iPhone Ve 2.3.4 集成：`clients/ve-tweak/README.md`、`clients/ve-tweak/patches/README.md`（源码级验证，真机验收仍需 Theos/越狱设备）。
 - Android 协议 smoke：`tests/android_ingest_e2e.ps1`。
 - iPhone 协议 smoke：`ios-shortcut/smoke.ps1`。
 - 通用脚本 WebSocket/Claim 客户端：`clients/script_api/otp_client.py`。

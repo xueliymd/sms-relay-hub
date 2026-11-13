@@ -60,7 +60,7 @@
 
 每个平台保存本地名称、Base URL、管理员用户名、是否记住密码、加密密码、加密会话、过期时间、最近连接时间和错误分类。
 
-Base URL 可为 https://sms.example.com 或 http://111.119.250.86:39300。保存前移除末尾斜杠，只允许 HTTP/HTTPS，拒绝内嵌账号密码、Fragment 和其他协议。
+Base URL 可为 https://sms.example.com 或 http://203.0.113.10:39300。保存前移除末尾斜杠，只允许 HTTP/HTTPS，拒绝内嵌账号密码、Fragment 和其他协议。
 
 登录调用 POST /api/v1/admin/login。登录成功后保存用户名、会话和过期时间；只有启用“记住密码”才保存 Keystore 加密密码。启动时优先复用未过期会话；会话失效且存在加密密码时只自动重新登录一次，失败后返回登录页。
 

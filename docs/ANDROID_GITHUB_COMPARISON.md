@@ -1,11 +1,31 @@
 # Android 与 GitHub 参考项目对照
 
-核对日期：2026-08-23。
+核对日期：2026-11-14。
 
 参考项目：
 
-- Android 应用：[pppscn/SmsForwarder](https://github.com/pppscn/SmsForwarder)，核对提交 `ce931a03739a6a2b0dfc83161bf812a94fd5e45e`。
-- Root 模块：[zgcwkjOpenProject/Magisk_SmsForwarder](https://github.com/zgcwkjOpenProject/Magisk_SmsForwarder)，核对提交 `254575885f9e3b1cb4ba2b0b9e64d4bb90d9bd7b`，上游标签 `1.2`。
+- Android 应用：[pppscn/SmsForwarder](https://github.com/pppscn/SmsForwarder)，最新核对提交 `a142f9270624e96b15ecfae53035581354fb6434`（2026-11-01）；上次基线为 `ce931a03739a6a2b0dfc83161bf812a94fd5e45e`。
+- Root 模块：[zgcwkjOpenProject/Magisk_SmsForwarder](https://github.com/zgcwkjOpenProject/Magisk_SmsForwarder)，最新核对提交仍为 `254575885f9e3b1cb4ba2b0b9e64d4bb90d9bd7b`，上游标签 `1.2`，无新提交。
+
+## 2026-11-14 上游增量复核
+
+`pppscn/SmsForwarder` 从上次基线到最新 `main` 共前进 5 个提交：
+
+| 上游提交 | 上游变更 | 对本项目的判断 |
+| --- | --- | --- |
+| `a3d2302` | 模板标签正则把 `([^=]+)` 改为 `(.+?)`，允许 `(?=...)` 等含 `=` 的正则。 | 本项目没有同款模板 DSL，不照搬；若以后增加消息模板，需要复用“正则段允许 `=`”的回归样本。 |
+| `0466e1d` | 服务端默认 fail-closed，修复 CVE-2026-110618。 | 安全方向应吸收。本项目已有设备类型/鉴权/来源三方绑定、默认关闭远程指令授权、HMAC 防重放和持久 nonce，不需要复制其内置 HTTP Server。 |
+| `fd9852c` | 修复 CI APK 输出路径。 | 仅上游流水线问题；本项目保持现有 Android 构建产物路径约定。 |
+| `45cb86b` | 按定位精度显式选择 provider，避免 `getBestProvider` 与用户设置不一致。 | 本项目不采集定位，不引入定位权限和 provider 逻辑。 |
+| `a142f92` | Android 16/17 部分 ROM 的 `divideMessage()` 抛 `getGroupIdLevel1` 异常时，降级到 GSM 7bit 160/153、UCS2 70/67 本地切分。 | 这是**发送短信**路径，当前接收端不受影响。以后实现远程 `send_sms` 时必须吸收该降级，并补设备/卡槽/重复发送测试。 |
+
+补充结论：
+
+- 当前 Android 接收端已经使用 `messages.joinToString("")` 合并多段 PDU，但缺少专门的“多段长短信合并”纯逻辑回归测试；不影响本次 iPhone 集成，列入后续测试债。
+- `SmsForwarder v3.5.0` 的多通道能力（Bark 随机 IV/重要警告、Telegram Topic/MarkdownV2、MQTT qos/retained、大文本通知、邮件别名、WOL、联系人姓名/归属地标签等）主要服务其独立客户端转发模型。本项目是集中式服务端规则引擎，不建议整体搬运。
+- Root 模块上游无更新，因此此前关于事件 watcher、spool、HMAC、幂等和低频扫描兜底的结论继续有效。
+
+以下 08-23 和 09-12 的架构对照保留为历史结论；其中“上游 HEAD 仍是 `ce931a0…`”只代表当时状态，已被本次 5 个提交更新。
 
 ## Android 应用
 

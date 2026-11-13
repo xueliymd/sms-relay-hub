@@ -3,6 +3,7 @@
 @interface SMSRelayClient : NSObject
 
 + (instancetype)sharedClient;
++ (BOOL)isEnabled;
 
 - (void)relayMessageFromSender:(NSString *)sender
                            body:(NSString *)body
