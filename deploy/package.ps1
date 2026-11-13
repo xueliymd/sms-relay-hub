@@ -17,7 +17,7 @@ $packagedCatalog = $null
 try {
     $publicAssets = Join-Path $repositoryRoot "web/public"
     if (-not (Test-Path -LiteralPath $publicAssets -PathType Container)) { throw "web/public download library is missing" }
-    foreach ($relative in @("backend", "clients/script_api", "clients/air724", "deploy", "web", "README.md", ".dockerignore")) {
+    foreach ($relative in @("backend", "clients/script_api", "clients/air724", "clients/ve-tweak", "deploy", "web", "README.md", ".dockerignore")) {
         Copy-Item -LiteralPath (Join-Path $repositoryRoot $relative) -Destination (Join-Path $staging $relative) -Recurse -Force
     }
 
@@ -25,6 +25,10 @@ try {
     $sessionReportDestination = Join-Path $staging "docs/SESSION_01A06BD1_HANDOFF.md"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $sessionReportDestination) | Out-Null
     Copy-Item -LiteralPath $sessionReportSource -Destination $sessionReportDestination -Force
+
+    Get-ChildItem -LiteralPath (Join-Path $staging "backend") -Directory -Force |
+        Where-Object { $_.Name -like ".venv*" } |
+        Remove-Item -Recurse -Force
 
     foreach ($relative in @(
         "web/node_modules",
@@ -160,6 +164,10 @@ try {
         "clients/air724/main.lua",
         "clients/air724/config.example.lua",
         "clients/air724/README.md",
+        "clients/ve-tweak/README.md",
+        "clients/ve-tweak/SMSRelayClient.h",
+        "clients/ve-tweak/SMSRelayClient.m",
+        "clients/ve-tweak/patches/ve-core-2.3.4-sms-relay.patch",
         "backend/app/mqtt_bridge.py",
         "clients/air724/mqtt_ingest.lua",
         "docs/SESSION_01A06BD1_HANDOFF.md",
@@ -184,7 +192,7 @@ try {
             throw "deployment archive contains local runtime or secret path: $forbidden"
         }
     }
-    if ($names | Where-Object { $_ -match "(^|/)(__pycache__|\.pytest_cache|\.mypy_cache|\.ruff_cache)(/|$)" -or $_ -match "\.(db|sqlite|sqlite3)(-(wal|shm))?$" -or $_ -match "\.pyc$" }) {
+    if ($names | Where-Object { $_ -match "(^|/)(__pycache__|\.pytest_cache|\.mypy_cache|\.ruff_cache)(/|$)" -or $_ -match "(^|/)\.venv[^/]*(/|$)" -or $_ -match "\.(db|sqlite|sqlite3)(-(wal|shm))?$" -or $_ -match "\.pyc$" }) {
         throw "deployment archive contains local cache or database artifacts"
     }
     $forbiddenArtifactPatterns = @("*.p12", "*.jks", "*.keystore", "*signing.properties")

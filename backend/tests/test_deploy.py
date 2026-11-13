@@ -262,6 +262,11 @@ def test_server_package_excludes_local_runtime_and_secret_files() -> None:
     assert "backend/app/mqtt_bridge.py" in package_script
     assert "clients/script_api/otp_client.py" in package_script
     assert "clients/script_api/README.md" in package_script
+    assert "clients/ve-tweak/README.md" in package_script
+    assert "clients/ve-tweak/SMSRelayClient.h" in package_script
+    assert "clients/ve-tweak/SMSRelayClient.m" in package_script
+    assert "clients/ve-tweak/patches/ve-core-2.3.4-sms-relay.patch" in package_script
+    assert '.venv*' in package_script
     assert "docs/SESSION_01A06BD1_HANDOFF.md" in package_script
     assert "web/public/assets/releases/release-catalog.json" in package_script
     assert "release.download_url" in package_script
