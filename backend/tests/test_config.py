@@ -31,6 +31,8 @@ def test_runtime_secrets_must_be_strong_and_decodable() -> None:
         ("retention_days", 0),
         ("retention_interval_seconds", 0),
         ("otp_ttl_seconds", 0),
+        ("device_command_pending_ttl_seconds", 0),
+        ("device_command_result_ttl_seconds", 0),
         ("claimed_otp_retention_seconds", 0),
         ("hmac_skew_seconds", 0),
         ("retention_days", -1),
@@ -67,6 +69,18 @@ def test_runtime_ports_must_be_valid(field: str, value: int) -> None:
 
     with pytest.raises(ValidationError):
         make_settings(**common, **{field: value})
+
+
+def test_otp_and_device_command_default_ttls_are_explicit() -> None:
+    common = {
+        "admin_token": "neutral-admin-token-for-tests-123456",
+        "data_encryption_key": base64.urlsafe_b64encode(b"k" * 32).decode(),
+        "database_url": "sqlite+pysqlite:///:memory:",
+    }
+    settings = make_settings(**common)
+    assert settings.otp_ttl_seconds == 600
+    assert settings.device_command_pending_ttl_seconds == 600
+    assert settings.device_command_result_ttl_seconds == 1800
 
 
 def test_public_base_url_is_normalized_and_rejects_credentials() -> None:

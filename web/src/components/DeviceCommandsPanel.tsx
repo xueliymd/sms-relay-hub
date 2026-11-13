@@ -18,6 +18,17 @@ const COMMAND_HINTS: Record<DeviceCommandType, string> = {
   trigger_upload: "让设备立即执行一次队列上报，用于排障与补传。",
 };
 
+const COMMAND_STATUS_LABELS: Record<string, string> = {
+  pending: "等待设备领取（10 分钟内有效）",
+  sent: "设备已领取，等待回传（30 分钟内有效）",
+  completed: "已完成",
+  expired: "已过期（设备未领取或未回传）",
+};
+
+function commandStatusLabel(status: string): string {
+  return COMMAND_STATUS_LABELS[status] ?? status;
+}
+
 /** 设备端回传中的业务错误（未授权/缺权限等），单独友好展示。 */
 function commandErrorMessage(command: DeviceCommand): string | null {
   const result = command.result;
@@ -197,7 +208,7 @@ export function DeviceCommandsPanel({
             <th>指令</th>
             <th>状态</th>
             <th>结果</th>
-            <th>完成时间</th>
+            <th>结束时间</th>
           </tr>
         </thead>
         <tbody>
@@ -215,7 +226,7 @@ export function DeviceCommandsPanel({
                 <tr key={command.id}>
                   <td>{command.created_at}</td>
                   <td>{DEVICE_COMMAND_LABELS[command.command_type] ?? command.command_type}</td>
-                  <td>{command.status}</td>
+                  <td><span className={`status-badge ${command.status}`}>{commandStatusLabel(command.status)}</span></td>
                   <td>
                     {errorText ? <span className="command-result-error">{errorText}</span> : describeCommandResult(command)}
                     {smsItems.length > 0 && (

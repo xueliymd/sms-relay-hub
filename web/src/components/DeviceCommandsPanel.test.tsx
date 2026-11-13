@@ -146,6 +146,30 @@ test("最近短信结果按条展开显示发件人、时间与正文", async ()
   expect(screen.getByText(/余额提醒/)).toBeInTheDocument();
 });
 
+test("过期指令显示明确状态且不再自动轮询", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  try {
+    mocks.listDeviceCommands.mockResolvedValue([
+      {
+        ...completedCommand,
+        id: "command-expired",
+        status: "expired" as const,
+        result: null,
+        completed_at: "2026-09-12T02:10:00+00:00",
+      },
+    ]);
+    render(<DeviceCommandsPanel token="admin" devices={devices} />);
+    await vi.waitFor(() => expect(screen.getByText(/已过期（设备未领取或未回传）/)).toBeInTheDocument());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5100);
+    });
+    expect(mocks.listDeviceCommands).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+
 test("存在未完成指令时自动轮询刷新结果", async () => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   try {

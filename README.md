@@ -39,7 +39,7 @@ docker compose -p deploy --env-file deploy/.env -f deploy/compose.yml up --build
 - HMAC 时间窗口与持久 nonce 防重放。
 - `(device_id, client_message_id)` 幂等约束；同请求重放返回 `200 duplicate=true`，同键异文返回 `409`。
 - 消息正文、发送方、metadata、HMAC 密钥和访问码字段级 AES-GCM 加密。
-- 4–8 位访问码识别、默认 30 分钟有效期、API Client 按手机号领取最新验证码、并发 Claim 保护；可用记录到期删除，已领取记录默认保留 1 天后删除。
+- 4–8 位访问码识别、默认 10 分钟有效期、API Client 按手机号领取最新验证码、并发 Claim 保护；可用记录到期删除，已领取记录默认保留 1 天后删除。
 - 7 天消息保留策略、验证码过期后最多约 60 秒自动清理、管理员手动清理。
 - React 管理控制台：设备、消息、访问码、凭据轮换/撤销、保留清理和 API 凭据创建。
 - Android 广播即时上传 + Room 加密队列 + WorkManager 失败重试；成功或终态后清空本地发送方和正文密文。
@@ -65,6 +65,9 @@ pwsh -File deploy/bootstrap.ps1
 - `ADMIN_TOKEN`：兼容现有维护脚本的恢复令牌；管理台不提供填写入口，日常使用用户名和密码登录。
 - `DATA_ENCRYPTION_KEY`：32 字节随机值的 base64url 编码。
 - `POSTGRES_PASSWORD`：URL 安全的随机密码。
+- `OTP_TTL_SECONDS`：访问码默认有效期，当前默认 `600` 秒（10 分钟）；已在服务器 `.env` 中显式写过旧值的，需要手动同步为 `600`。
+- `DEVICE_COMMAND_PENDING_TTL_SECONDS`：设备未轮询时指令的等待上限，默认 `600` 秒；超时后状态变为 `expired`，不会永久停留在 `pending`。
+- `DEVICE_COMMAND_RESULT_TTL_SECONDS`：设备已领取但未回传结果的收口上限，默认 `1800` 秒；期间超过 10 分钟未回传会重新投递，最终仍未回传则变为 `expired`。
 - `DATABASE_URL`：例如 `postgresql+psycopg://sms_relay:<password>@postgres:5432/sms_relay`，初始化脚本会根据 PostgreSQL 参数自动生成。
 
 管理台只使用 `ADMIN_USERNAME` + `ADMIN_PASSWORD` 登录；登录后可在右上角修改账号。登录成功后浏览器自动保存短期会话，用户不需要填写管理令牌。`ADMIN_TOKEN` 的后端兼容入口保留给维护脚本。设备使用设备凭据，脚本取码使用单独的 API Client Bearer Token。

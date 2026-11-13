@@ -78,6 +78,9 @@ DEVICE_COMMAND_TYPES = {
 DEVICE_COMMAND_QUEUE_LIMIT = 20
 # 已下发但迟迟没有结果（设备取走指令后进程被杀等）的重新投递等待时长
 DEVICE_COMMAND_REDELIVER_AFTER = timedelta(minutes=10)
+# 设备未领取/未回传的指令不能永久挂起。pending 超时后不再下发，sent 超时后
+# 也不再重投；两者最终都会显式变为 expired，管理端可据此重新下发。
+# 具体秒数由 settings 控制，默认 pending 10 分钟、sent 30 分钟。
 
 PHONE_NUMBER_PATTERN = re.compile(r"^\+?[0-9\s().-]+$")
 
@@ -2153,6 +2156,8 @@ class RelayStore:
                     raise KeyError("device_not_found")
                 if not device.active:
                     raise ValueError("device_not_active")
+                now = utc_now()
+                self._expire_device_commands(session, now, device_id=str(device_id))
                 outstanding = session.scalar(
                     select(func.count())
                     .select_from(DeviceCommandModel)
@@ -2165,7 +2170,6 @@ class RelayStore:
                     raise ValueError("command_queue_full")
                 # 低频清理历史指令（与转发日志同款借用写入时机），保留 7 天
                 global _DEVICE_COMMAND_PRUNE_AT
-                now = utc_now()
                 if now.timestamp() - _DEVICE_COMMAND_PRUNE_AT > 600:
                     _DEVICE_COMMAND_PRUNE_AT = now.timestamp()
                     session.execute(
@@ -2200,6 +2204,7 @@ class RelayStore:
                 if session.get(DeviceModel, str(device_id)) is None:
                     raise KeyError("device_not_found")
                 now = utc_now()
+                self._expire_device_commands(session, now, device_id=str(device_id))
                 stale_before = now - DEVICE_COMMAND_REDELIVER_AFTER
                 models = session.scalars(
                     select(DeviceCommandModel)
@@ -2231,9 +2236,13 @@ class RelayStore:
     ) -> dict[str, Any] | None:
         with self.lock:
             with self.session_factory.begin() as session:
+                now = utc_now()
+                self._expire_device_commands(session, now, device_id=str(device_id))
                 model = session.get(DeviceCommandModel, str(command_id))
                 if model is None or model.device_id != str(device_id):
                     return None
+                if model.status == "expired":
+                    raise ValueError("command_expired")
                 if model.status == "completed":
                     return self._device_command_from_model(model)
                 encrypted = self.crypto.encrypt_text(
@@ -2244,7 +2253,7 @@ class RelayStore:
                 model.result_ciphertext = encrypted.ciphertext
                 model.result_key_version = encrypted.key_version
                 model.status = "completed"
-                model.completed_at = utc_now()
+                model.completed_at = now
                 self._audit(
                     session,
                     "device_command.completed",
@@ -2254,16 +2263,44 @@ class RelayStore:
                 return self._device_command_from_model(model)
 
     def list_device_commands(self, device_id: UUID | str, limit: int = 50) -> list[dict[str, Any]]:
-        with self.session_factory() as session:
-            if session.get(DeviceModel, str(device_id)) is None:
-                raise KeyError("device_not_found")
-            models = session.scalars(
-                select(DeviceCommandModel)
-                .where(DeviceCommandModel.device_id == str(device_id))
-                .order_by(DeviceCommandModel.created_at.desc(), DeviceCommandModel.id.desc())
-                .limit(max(1, min(int(limit), 200)))
-            ).all()
-            return [self._device_command_from_model(m) for m in models]
+        with self.lock:
+            with self.session_factory.begin() as session:
+                if session.get(DeviceModel, str(device_id)) is None:
+                    raise KeyError("device_not_found")
+                self._expire_device_commands(session, utc_now(), device_id=str(device_id))
+                models = session.scalars(
+                    select(DeviceCommandModel)
+                    .where(DeviceCommandModel.device_id == str(device_id))
+                    .order_by(DeviceCommandModel.created_at.desc(), DeviceCommandModel.id.desc())
+                    .limit(max(1, min(int(limit), 200)))
+                ).all()
+                return [self._device_command_from_model(m) for m in models]
+
+    def _expire_device_commands(
+        self, session: Session, now: datetime, *, device_id: str | None = None
+    ) -> None:
+        """把超出生命周期的未完成指令显式收口为 expired。"""
+        pending_before = now - timedelta(seconds=settings.device_command_pending_ttl_seconds)
+        result_before = now - timedelta(seconds=settings.device_command_result_ttl_seconds)
+        statement = (
+            update(DeviceCommandModel)
+            .where(
+                or_(
+                    and_(
+                        DeviceCommandModel.status == "pending",
+                        DeviceCommandModel.created_at <= pending_before,
+                    ),
+                    and_(
+                        DeviceCommandModel.status == "sent",
+                        DeviceCommandModel.created_at <= result_before,
+                    ),
+                )
+            )
+            .values(status="expired", completed_at=now)
+        )
+        if device_id is not None:
+            statement = statement.where(DeviceCommandModel.device_id == device_id)
+        session.execute(statement)
 
     def _device_command_from_model(self, model: DeviceCommandModel) -> dict[str, Any]:
         result: dict[str, Any] | None = None

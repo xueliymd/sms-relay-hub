@@ -28,7 +28,9 @@ class Settings(BaseSettings):
     device_conflict_window_seconds: int = Field(default=600, ge=60, le=86400)
     retention_days: int = Field(default=7, ge=1, le=3650)
     retention_interval_seconds: int = Field(default=3600, ge=1, le=86400)
-    otp_ttl_seconds: int = Field(default=1800, ge=1, le=86400)
+    otp_ttl_seconds: int = Field(default=600, ge=1, le=86400)
+    device_command_pending_ttl_seconds: int = Field(default=600, ge=30, le=86400)
+    device_command_result_ttl_seconds: int = Field(default=1800, ge=60, le=86400)
     claimed_otp_retention_seconds: int = Field(default=86400, ge=1, le=604800)
     hmac_skew_seconds: int = Field(default=300, ge=1, le=3600)
     release_manifest_path: str = ""

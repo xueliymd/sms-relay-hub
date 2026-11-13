@@ -15,6 +15,7 @@ from typing import Any, cast
 from fastapi.testclient import TestClient
 from sqlalchemy import update
 
+from app.core.config import settings
 from app.db.models import DeviceCommandModel
 from app.services.store import store, utc_now
 from tests.test_relay import ADMIN_HEADERS, create_device
@@ -239,6 +240,72 @@ def test_stale_sent_command_is_redelivered_after_timeout(client: TestClient) -> 
         headers=signed_headers(device_id, secret, b"", nonce="cmd-stale-poll-3"),
     )
     assert [c["id"] for c in redelivered.json()["commands"]] == [command_id]
+
+
+def test_unclaimed_command_expires_instead_of_waiting_forever(client: TestClient) -> None:
+    """软件未对接/长期不轮询时，pending 必须有明确终点而不是永久等待。"""
+    device_id, secret = create_hmac_device(client)
+    command_id = enqueue_command(client, device_id, "query_battery", "cmd-expire-issue").json()["id"]
+
+    with store.session_factory.begin() as session:
+        session.execute(
+            update(DeviceCommandModel)
+            .where(DeviceCommandModel.id == command_id)
+            .values(
+                created_at=utc_now()
+                - timedelta(seconds=settings.device_command_pending_ttl_seconds + 1)
+            )
+        )
+
+    listed = client.get(
+        f"/api/v1/admin/devices/{device_id}/commands",
+        headers={**ADMIN_HEADERS, "X-Nonce": "cmd-expire-list"},
+    )
+    assert listed.status_code == 200
+    assert listed.json()[0]["status"] == "expired"
+    assert listed.json()[0]["completed_at"] is not None
+
+    polled = client.get(
+        f"/api/v1/devices/{device_id}/commands/pending",
+        headers=signed_headers(device_id, secret, b"", nonce="cmd-expire-poll"),
+    )
+    assert polled.status_code == 200
+    assert polled.json()["commands"] == []
+
+
+def test_sent_command_expires_when_result_never_arrives(client: TestClient) -> None:
+    """设备取走指令后一直不回传，sent 超过结果生命周期后也要收口。"""
+    device_id, secret = create_hmac_device(client)
+    command_id = enqueue_command(client, device_id, "trigger_upload", "cmd-sent-expire-issue").json()["id"]
+    client.get(
+        f"/api/v1/devices/{device_id}/commands/pending",
+        headers=signed_headers(device_id, secret, b"", nonce="cmd-sent-expire-poll"),
+    )
+
+    with store.session_factory.begin() as session:
+        session.execute(
+            update(DeviceCommandModel)
+            .where(DeviceCommandModel.id == command_id)
+            .values(
+                created_at=utc_now()
+                - timedelta(seconds=settings.device_command_result_ttl_seconds + 1)
+            )
+        )
+
+    listed = client.get(
+        f"/api/v1/admin/devices/{device_id}/commands",
+        headers={**ADMIN_HEADERS, "X-Nonce": "cmd-sent-expire-list"},
+    ).json()
+    assert listed[0]["status"] == "expired"
+
+    late_body = json.dumps({"result": {"queued": 1}}, separators=(",", ":")).encode()
+    late_result = client.post(
+        f"/api/v1/devices/{device_id}/commands/{command_id}/result",
+        content=late_body,
+        headers=signed_headers(device_id, secret, late_body, nonce="cmd-sent-expire-result"),
+    )
+    assert late_result.status_code == 409
+    assert late_result.json()["error"]["code"] == "command_expired"
 
 
 def test_command_list_rejects_unknown_device(client: TestClient) -> None:

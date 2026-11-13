@@ -79,7 +79,9 @@ v1 已按"先做查类子集"落地，下行通道采用**轮询**（不做长�
   （`GET /devices/{id}/commands/pending`、`POST /devices/{id}/commands/{id}/result`，
   均 HMAC 鉴权且强制路径设备 ID 与凭据一致）+ 审计事件
 - **网页管理台**：新增"远程控制"标签页（选择设备 → 下发指令 → 查看结果），
-  下发带二次确认，面板含 `DeviceCommandsPanel` + 4 项组件测试
+  下发带二次确认，面板含 `DeviceCommandsPanel` + 过期状态/自动刷新组件测试
+- **生命周期兜底**：设备长期不轮询时 `pending` 默认 10 分钟后变为 `expired`；
+  已领取但未回传的 `sent` 默认 30 分钟后收口，超时结果回传返回 `409 command_expired`
 - **采集端 1.0.19**：`DeviceCommandClient`/`DeviceCommandPoller`/`DeviceCommandExecutor`；
   轮询挂在既有上报周期（短信到达 + 15 分钟看门狗）顺带执行，失败静默下轮重试；
   重入由标志位挡住，避免 trigger_upload 递归
@@ -87,11 +89,10 @@ v1 已按"先做查类子集"落地，下行通道采用**轮询**（不做长�
   `command_not_authorized` 说明，不读取任何数据；结果加密存储、号码脱敏；
   `query_recent_sms` 另需 READ_SMS 运行时权限（缺失时回传说明）
 
-验证：后端 **243 项测试通过**（含新增 `tests/test_device_commands.py` 6 项：生命周期 /
-幂等 / 签名无效与设备不一致拒绝 / 未知指令与超限体积 / 不支持类型与撤销设备 /
-管理端鉴权）；网页 **56 项测试通过** + 构建成功；采集端单测 + lint + 签名构建通过。
+验证：后端 **261 项测试通过**（远程控制生命周期、超时过期、幂等、签名、
+撤销、队列上限和管理端鉴权均已覆盖）；网页 **61 项测试通过** + 构建成功。
 
-未做（后续可选）：管理端 App 的远程控制 UI、指令结果主动推送（当前需手动刷新）、
+未做（后续可选）：指令结果主动推送（当前需轮询刷新）、
 `query_location`/`send_sms` 等敏感指令（v2 再评估）。
 
 <details><summary>原始评估（存档）</summary>

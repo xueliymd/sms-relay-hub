@@ -16,7 +16,8 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from app.core.config import settings
 from app.core.errors import RelayError
-from app.core.redaction import mask_phone_number as _mask_phone_number, scrub_metadata
+from app.core.redaction import mask_phone_number as _mask_phone_number
+from app.core.redaction import scrub_metadata
 from app.db.models import utc_now
 from app.services.admin_message_websocket import (
     AdminMessageSubscription,
@@ -1132,7 +1133,12 @@ async def device_command_result(
         raise RelayError(422, "invalid_command_result", "result must be an object")
     if len(json.dumps(result, separators=(",", ":")).encode()) > 16384:
         raise RelayError(422, "invalid_command_result", "result is too large")
-    completed = store.complete_device_command(device_id, str(command_id), result)
+    try:
+        completed = store.complete_device_command(device_id, str(command_id), result)
+    except ValueError as exc:
+        if str(exc) == "command_expired":
+            raise RelayError(409, "command_expired", "Command expired before its result arrived") from exc
+        raise
     if completed is None:
         raise RelayError(404, "command_not_found", "Command not found for this device")
     return {"accepted": True, "status": completed["status"]}

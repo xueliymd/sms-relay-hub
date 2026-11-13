@@ -52,9 +52,10 @@ data class DeviceCommand(
     val sentAt: String?,
     val completedAt: String?,
 ) {
-    /** 采集端为待执行指令保留的状态只有 pending / sent / completed。 */
+    /** 设备端未完成指令的两种状态；超时后后端会返回 expired。 */
     val isPending: Boolean get() = status == "pending" || status == "sent"
     val isCompleted: Boolean get() = status == "completed"
+    val isExpired: Boolean get() = status == "expired"
 }
 
 /** 指令类型的中文名，与后端 store.DEVICE_COMMAND_TYPES 的说明一一对应。 */

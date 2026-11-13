@@ -40,7 +40,9 @@ set_if_empty POSTGRES_DB sms_relay
 set_if_empty POSTGRES_USER sms_relay
 set_if_empty RETENTION_DAYS 7
 set_if_empty RETENTION_INTERVAL_SECONDS 3600
-set_if_empty OTP_TTL_SECONDS 1800
+set_if_empty OTP_TTL_SECONDS 600
+set_if_empty DEVICE_COMMAND_PENDING_TTL_SECONDS 600
+set_if_empty DEVICE_COMMAND_RESULT_TTL_SECONDS 1800
 set_if_empty CLAIMED_OTP_RETENTION_SECONDS 86400
 set_if_empty HMAC_SKEW_SECONDS 300
 generated_admin_password=""

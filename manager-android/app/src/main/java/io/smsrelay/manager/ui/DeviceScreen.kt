@@ -149,9 +149,10 @@ class DeviceScreen(
     }
 
     private fun commandStatusLabel(value: String): String = when (value) {
-        "pending" -> "待设备取走"
-        "sent" -> "已下发待回传"
+        "pending" -> "等待设备领取（10 分钟内有效）"
+        "sent" -> "设备已领取，等待回传（30 分钟内有效）"
         "completed" -> "已完成"
+        "expired" -> "已过期（设备未领取或未回传）"
         else -> value
     }
 

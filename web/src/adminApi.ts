@@ -217,7 +217,7 @@ export type DeviceCommand = {
   id: string;
   device_id: string;
   command_type: DeviceCommandType | string;
-  status: "pending" | "sent" | "completed";
+  status: "pending" | "sent" | "completed" | "expired";
   result: Record<string, unknown> | null;
   created_at: string;
   sent_at: string | null;
@@ -272,6 +272,7 @@ export function describeCommandResult(command: DeviceCommand): string {
     return JSON.stringify(result);
   }
   if (command.status === "completed") return "已完成（无结果数据）";
-  if (command.status === "sent") return "已下发，等待设备执行";
+  if (command.status === "expired") return "设备未领取或回传超时，指令已过期";
+  if (command.status === "sent") return "设备已领取，等待回传";
   return "等待设备轮询";
 }
