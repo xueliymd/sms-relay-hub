@@ -535,6 +535,25 @@ def test_shortcut_plain_text_idempotency_uses_a_minute_bucket() -> None:
     assert retry_across_minutes["received_at"] == "2026-08-21T04:41:35+00:00"
 
 
+def test_shortcut_device_date_idempotency_survives_a_retry_across_minutes() -> None:
+    # The shortcut can be retried after the server minute changes. A device Date
+    # is stable across that retry and must remain the idempotency anchor.
+    message = {
+        "Sender": "Authorized Relay Test",
+        "Content": "Your relay access code is 482731",
+        "Date": "2026-08-21T12:40:00+08:00",
+    }
+    first = build_shortcut_payload(
+        message,
+        received_at=datetime(2026, 8, 21, 4, 40, 10, tzinfo=timezone.utc),
+    )
+    retry = build_shortcut_payload(
+        message,
+        received_at=datetime(2026, 8, 21, 4, 41, 35, tzinfo=timezone.utc),
+    )
+
+    assert first["client_message_id"] == retry["client_message_id"]
+
 def test_shortcut_empty_message_date_uses_a_minute_bucket() -> None:
     first = build_shortcut_payload(
         {"Sender": "Relay", "Content": "Code 482731", "Date": "   "},

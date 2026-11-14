@@ -477,6 +477,27 @@ test("switches the device tutorial to the iPhone Shortcut workflow", async () =>
   expect(screen.getByRole("img", { name: "信息自动化触发配置示例" })).toBeInTheDocument();
 });
 
+test("opens the iOS Ve notification hook tutorial and exposes the source package", async () => {
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("管理员用户名"), { target: { value: "admin" } });
+  fireEvent.change(screen.getByLabelText("管理员密码"), { target: { value: "neutral-admin-password-123456" } });
+  fireEvent.click(screen.getByRole("button", { name: "登录" }));
+  await screen.findByText("Authorized Android");
+
+  fireEvent.click(screen.getByRole("button", { name: "演示教程" }));
+  fireEvent.click(screen.getByRole("tab", { name: "iOS Ve 通知 Hook" }));
+
+  expect(screen.getByRole("tab", { name: "iOS Ve 通知 Hook" })).toHaveAttribute("aria-selected", "true");
+  expect(screen.getByRole("link", { name: "下载 ve-tweak-source.zip" })).toHaveAttribute("href", "/assets/downloads/ve-tweak-source.zip");
+  expect(await screen.findByRole("img", { name: "Ve 插件源码包下载二维码" })).toHaveAttribute(
+    "src",
+    expect.stringMatching(/^data:image\/png;base64,/),
+  );
+  expect(screen.getByText(/不是预编译 deb/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "WingCH/Ve" })).toHaveAttribute("href", "https://github.com/WingCH/Ve");
+  expect(screen.getAllByText((_, element) => element?.textContent?.includes("THEOS_PACKAGE_SCHEME=rootless") === true).length).toBeGreaterThan(0);
+  expect(screen.getByText("/var/mobile/Library/Preferences/com.smsrelay.ve.plist")).toBeInTheDocument();
+});
 test("shows Air724 as a managed script consumer instead of an ingest device", async () => {
   render(<App />);
   fireEvent.change(screen.getByLabelText("管理员用户名"), { target: { value: "admin" } });

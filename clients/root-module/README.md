@@ -75,13 +75,26 @@ KernelSU 和 Magisk 的流程也是“模块 -> 从存储安装 -> 选择 ZIP ->
   "poll_interval_seconds": 3,
   "watcher_idle_seconds": 1,
   "max_backoff_seconds": 300,
-  "sms_database_path": ""
+  "sms_database_path": "",
+  "allow_query_battery": false,
+  "allow_query_recent_sms": false,
+  "allow_trigger_upload": false
 }
 ```
 
 `base_url` 填服务端根地址，不要把 `/api/v1/ingest/messages` 再写进去；上传器会自动追加该路径。
 
 配置文件由 Root 服务按严格的扁平 JSON 读取：每个字段单独占一行，顶层 `{` 和 `}` 单独占一行，不要把对象压缩成单行，也不要使用嵌套对象、数组或 JSON 转义字符串。控制台保存的配置会自动使用兼容格式。
+
+### 远程控制授权
+
+Web 控制台“远程控制授权”中的三项默认全部关闭。后台下发指令后，设备会正常领取并回传明确结果；若授权未开启，结果为 `command_not_authorized`，不会静默失败。
+
+- `allow_query_battery`：允许后台查询电量与充电状态。
+- `allow_query_recent_sms`：允许后台读取最近 5 条短信；发件人会打码，正文最多返回 200 个字符。
+- `allow_trigger_upload`：允许后台唤醒一次立即上传。
+
+不需要远程控制时保持三项关闭。指令未领取会在 10 分钟后变为 `expired`；已领取但未回传会在 30 分钟后变为 `expired`。
 
 - 生产环境：填 `https://你的域名`；若使用 HTTPS IP 加端口，例如 `https://203.0.113.10:8443`，也支持。
 - 本地同一 Wi-Fi 联调：可以显式打开 `allow_insecure_local_http`，并使用私网 IP 加端口，例如 `http://192.168.2.109:39300`。该开关只接受回环或私网 IP，不接受公网 HTTP、主机名 HTTP 或没有端口的地址。
@@ -254,6 +267,6 @@ sh /data/adb/modules/sms-relay-root/action.sh start
 
 当前已完成：源码测试、Shell 合约测试、HTTP 分类测试、HMAC 向量测试、双 ABI 运行时自检和包内容检查；并已在小米 `M2011K2C` 的 APatch 环境安装旧版本做过 HTTP 201 联调。`0.2.7` 修复首次安装尚无配置时控制台无法启动；`0.2.9` 将 Provider 游标改为“时间戳 + 行 ID”水位线，避免升级后批量上传历史短信；`0.3.0` 增加目录锁降级并兼容一加 SIM 列差异；`0.3.1` 修复首次配置等待和发行 ABI 体积。`0.3.2` 在 ARM64 上改为直接发现并只读扫描 CE/DE Telephony SQLite。`0.3.3` 修复 MIUI 使用 `sub_id=-1` 时 SQLite 快速路径被错误中断并退回慢 Provider 的问题，增加中文高级设置、数据库验证、CE/DE 诊断、watcher 解锁后恢复、读取失败状态恢复和锁竞争清理保护。`0.3.4` 将同一只读 SQLite 兼容路径带到 ARMv7，并让控制台保留数据库验证的具体错误代码。`0.3.7` 扩展 `mmssms.db` 与 `sms.db` 的 WAL/SHM watcher，正常空闲等待改用事件唤醒，并删除上传路径中未使用的重复独立 SHA-256 计算；`0.3.8` 增加管理端二维码扫码、图片和粘贴导入，自动兑换 Root HMAC 配置并热启动服务；HMAC、spool、幂等和失败重试保持不变。模块不会读取启用前历史短信，也不会修改短信的已读、删除或归档状态。
 
-`0.3.10` 收紧上传超时并优化失败退避：WS/MQTT 等待上限降为 10 秒，HTTP 回退改为 5 秒连接 / 15 秒总等待；一条上传失败会立即进入退避，不再逐条等待剩余 spool。控制台同步改为吸顶分区导航、状态卡和卡片式布局。
+`0.3.11` 在 Web 控制台新增远程指令授权开关，支持查询电量、查询最近短信和触发立即上传；三项默认关闭，未授权会明确回传，指令到期自动收口。`0.3.10` 收紧上传超时并优化失败退避：WS/MQTT 等待上限降为 10 秒，HTTP 回退改为 5 秒连接 / 15 秒总等待；一条上传失败会立即进入退避，不再逐条等待剩余 spool。控制台同步改为吸顶分区导航、状态卡和卡片式布局。
 
 上述结论只覆盖本次真机和本地私网 HTTP 联调。其他 ROM、其他 Root 管理器、其他 ABI、工作资料用户以及真实生产 HTTPS 仍属于 external acceptance，不能用这一次实测替代；也不能把仅有 source/static 检查的组合写成“所有机型已经转发成功”。

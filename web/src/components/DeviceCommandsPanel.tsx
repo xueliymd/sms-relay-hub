@@ -19,8 +19,8 @@ const COMMAND_HINTS: Record<DeviceCommandType, string> = {
 };
 
 const COMMAND_STATUS_LABELS: Record<string, string> = {
-  pending: "等待设备领取（10 分钟内有效）",
-  sent: "设备已领取，等待回传（30 分钟内有效）",
+  pending: "等待设备领取（默认 10 分钟内有效）",
+  sent: "设备已领取，等待回传（默认 30 分钟内有效）",
   completed: "已完成",
   expired: "已过期（设备未领取或未回传）",
 };
@@ -71,8 +71,9 @@ export function DeviceCommandsPanel({
       devices.filter(
         (device) =>
           device.active &&
-          // v1 只支持 HMAC 设备（Android 应用 / Root 模块）：下行走设备签名轮询，
-          // iOS 快捷指令（bearer）与 724 取码设备没有常驻进程，无法领取指令。
+          // v1 只有 Android 应用与 Root 模块带常驻签名轮询器。iOS Ve 虽然也是
+          // HMAC，但 SpringBoard 内没有命令轮询线程，不能进入目标设备列表。
+          (device.client_type === "android_app" || device.client_type === "root_module") &&
           device.auth_kind === "hmac",
       ),
     [devices],
@@ -114,7 +115,7 @@ export function DeviceCommandsPanel({
 
   useEffect(() => {
     if (!deviceId) return;
-    // 有未完成指令时自动轮询结果（设备在下一次上报周期才取指令执行）
+    // 有未完成指令时自动轮询结果；Android/Root 通过约 60 秒心跳领取。
     const hasOutstanding = commands.some(
       (command) => command.status === "pending" || command.status === "sent",
     );
@@ -139,7 +140,7 @@ export function DeviceCommandsPanel({
       setBusy(true);
       try {
         await issueDeviceCommand(token, deviceId, commandType);
-        await refresh(`已下发「${label}」，等待设备下一次轮询执行`);
+        await refresh(`已下发「${label}」，等待设备心跳领取并执行`);
       } catch (error) {
         setNotice(`下发失败：${String(error)}`);
       } finally {
@@ -155,8 +156,8 @@ export function DeviceCommandsPanel({
         <div>
           <h2 id="device-commands-title">远程控制（设备指令）</h2>
           <span className="section-count">
-            下行采用轮询：设备在下一次上报周期领取指令并回传结果，非实时；每类指令需设备端单独授权。
-            仅支持 Android 应用 / Root 模块（HMAC）设备，快捷指令类设备无常驻进程无法领取指令。
+            下行采用心跳轮询：Android/Root 约每 60 秒领取指令并回传结果，非实时；每类指令需设备端单独授权。
+            仅支持 Android 应用 / Root 模块；其他客户端没有常驻指令轮询器，不能接收下行指令。
           </span>
         </div>
         <button className="secondary-button" onClick={() => void refresh()} disabled={busy}>

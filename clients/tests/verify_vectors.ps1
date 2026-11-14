@@ -576,6 +576,15 @@ if ($machineOutcomeFailures.Count -gt 0) {
 }
 
 $latestRootReviewFailures = [Collections.Generic.List[string]]::new()
+if ($rootServiceText -notmatch '(?m)^command_clock_seconds\(\)\s*\{' -or
+    $rootServiceText -notmatch 'last_command_poll=-1' -or
+    $rootServiceText -notmatch 'command_clock_uptime=\$\{command_clock_uptime%' -or
+    $rootServiceText -notmatch 'command_poll_fallback_elapsed=60' -or
+    $rootServiceText -notmatch '\|\*\[!0-9\]\*\|0\)' -or
+    $rootServiceText -notmatch '\$command_now" -lt "\$last_command_poll' -or
+    $rootServiceText -notmatch 'COMMAND_POLL_INTERVAL_SECONDS=60') {
+    $latestRootReviewFailures.Add('command_poll_clock_regression_unguarded')
+}
 if ($rootServiceText -notmatch 'QUARANTINE_DIR' -or
     $rootServiceText -notmatch '409\|422\)' -or
     $rootServiceText -notmatch 'local_body_invalid\|local_body_too_large\|local_body_read_failed' -or
@@ -1000,13 +1009,15 @@ foreach ($line in ($veClientText -split "`n")) {
 Assert-Contains -Label 'Ve Logos hook class' -Text $veHookText -Pattern '%hook\s+BBServer'
 Assert-Contains -Label 'Ve bulletin selector' -Text $veHookText -Pattern 'publishBulletin:\s*\(BBBulletin\s*\*\)bulletin\s+destinations:'
 Assert-Contains -Label 'Ve exact MobileSMS filter' -Text $veHookText -Pattern '\[sectionID isEqualToString:@"com\.apple\.MobileSMS"\]'
-foreach ($selectorName in @('sectionID', 'title', 'message', 'date')) {
+foreach ($selectorName in @('sectionID', 'title', 'message', 'publicationDate', 'date')) {
     Assert-Contains -Label "Ve bulletin selector guard $selectorName" -Text $veHookText -Pattern ([regex]::Escape("[bulletin respondsToSelector:@selector($selectorName)]"))
 }
 Assert-Contains -Label 'Ve bulletin section raw field' -Text $veHookText -Pattern 'id\s+sectionValue\s*=\s*bulletin\.sectionID'
 Assert-Contains -Label 'Ve bulletin title raw field' -Text $veHookText -Pattern 'id\s+senderValue\s*=\s*bulletin\.title'
 Assert-Contains -Label 'Ve bulletin message raw field' -Text $veHookText -Pattern 'id\s+bodyValue\s*=\s*bulletin\.message'
-Assert-Contains -Label 'Ve bulletin date raw field' -Text $veHookText -Pattern 'id\s+dateValue\s*=\s*bulletin\.date'
+Assert-Contains -Label 'Ve bulletin publication date field' -Text $veHookText -Pattern 'id\s+dateValue\s*=\s*nil'
+Assert-Contains -Label 'Ve bulletin publicationDate getter' -Text $veHookText -Pattern 'dateValue\s*=\s*bulletin\.publicationDate'
+Assert-Contains -Label 'Ve bulletin date fallback getter' -Text $veHookText -Pattern 'dateValue\s*=\s*bulletin\.date'
 Assert-Contains -Label 'Ve bulletin section type guard' -Text $veHookText -Pattern '!\[sectionValue isKindOfClass:\[NSString class\]\]'
 Assert-Contains -Label 'Ve bulletin sender type guard' -Text $veHookText -Pattern '!\[senderValue isKindOfClass:\[NSString class\]\]'
 Assert-Contains -Label 'Ve bulletin body type guard' -Text $veHookText -Pattern '!\[bodyValue isKindOfClass:\[NSString class\]\]'
@@ -1022,7 +1033,7 @@ $veDelegateIndex = $veHookText.IndexOf('[[SMSRelayClient sharedClient] relayMess
 if ($veFilterIndex -lt 0 -or $veDelegateIndex -lt 0 -or $veFilterIndex -gt $veDelegateIndex) {
     throw 'Ve MobileSMS filter must execute before relay delegation'
 }
-foreach ($selectorName in @('sectionID', 'title', 'message', 'date')) {
+foreach ($selectorName in @('sectionID', 'title', 'message', 'publicationDate', 'date')) {
     $guardIndex = $veHookText.IndexOf("[bulletin respondsToSelector:@selector($selectorName)]", [StringComparison]::Ordinal)
     $getterIndex = $veHookText.IndexOf("bulletin.$selectorName", [StringComparison]::Ordinal)
     if ($guardIndex -lt 0 -or $getterIndex -lt 0 -or $guardIndex -gt $getterIndex) {

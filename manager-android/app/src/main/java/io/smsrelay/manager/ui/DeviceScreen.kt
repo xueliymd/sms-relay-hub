@@ -8,6 +8,7 @@ import io.smsrelay.manager.model.AdminDevice
 import io.smsrelay.manager.model.DeviceCommand
 import io.smsrelay.manager.model.SimProfile
 import io.smsrelay.manager.model.commandTypeLabel
+import io.smsrelay.manager.model.supportsDeviceCommands
 import io.smsrelay.manager.time.MessageTime
 
 /**
@@ -100,14 +101,24 @@ class DeviceScreen(
 
     /**
      * 远程控制区块：三条白名单指令 + 最近回传结果。
-     * 只在已启用设备上渲染 —— 后端对非 active 设备下发会返回 409 device_not_active。
+     * 仅对已启用且支持指令的设备渲染；非 active 设备后端会返回 409 device_not_active，
+     * iOS Ve、快捷指令、合宙 724 等客户端没有常驻指令轮询器，不显示下发按钮。
      */
     private fun addRemoteControl(context: Context, card: LinearLayout, device: AdminDevice) {
         card.addMatch(sectionTitle(context, "远程控制"))
+        if (!supportsDeviceCommands(device.clientType)) {
+            card.addMatch(
+                bodyText(
+                    context,
+                    "当前设备类型为「" + clientTypeLabel(device.clientType) + "」，没有常驻指令轮询器，不能接收下行指令。远程控制仅支持 Android 应用 / Android Root。",
+                ),
+            )
+            return
+        }
         card.addMatch(
             bodyText(
                 context,
-                "指令由设备轮询执行（采集端最短 30 秒取一次），且需在采集端应用内开启对应指令授权，下发后通常数十秒出结果。",
+                "仅 Android 应用 / Root 模块支持；设备约每 60 秒通过心跳领取并回传，非实时。每类指令需在设备端单独授权；未领取默认 10 分钟过期，已领取默认 30 分钟回传窗口。",
             ),
         )
         val commandRow = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
@@ -149,8 +160,8 @@ class DeviceScreen(
     }
 
     private fun commandStatusLabel(value: String): String = when (value) {
-        "pending" -> "等待设备领取（10 分钟内有效）"
-        "sent" -> "设备已领取，等待回传（30 分钟内有效）"
+        "pending" -> "等待设备领取（默认 10 分钟内有效）"
+        "sent" -> "设备已领取，等待回传（默认 30 分钟内有效）"
         "completed" -> "已完成"
         "expired" -> "已过期（设备未领取或未回传）"
         else -> value

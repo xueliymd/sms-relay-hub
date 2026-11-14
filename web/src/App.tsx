@@ -1559,7 +1559,7 @@ function DataTable({ headers, empty, children }: { headers: string[]; empty: str
 }
 
 function DeviceTutorial({ onClose, releases }: { onClose: () => void; releases: ReleaseEntry[] }) {
-  const [tutorialTab, setTutorialTab] = useState<"androidApp" | "androidRoot" | "ios" | "air724">("androidApp");
+  const [tutorialTab, setTutorialTab] = useState<"androidApp" | "androidRoot" | "ios" | "iosVe" | "air724">("androidApp");
   const latestAndroid = latestRelease(releases, "android");
   const latestRoot = latestRelease(releases, "root");
   return (
@@ -1568,7 +1568,7 @@ function DeviceTutorial({ onClose, releases }: { onClose: () => void; releases: 
         <div className="section-heading compact">
           <div>
             <h2 id="device-tutorial-title">设备接入演示教程</h2>
-            <span className="section-count">Android 应用、Root 模块、iPhone 快捷指令与合宙 724 取码</span>
+            <span className="section-count">Android 应用、Root 模块、iPhone 快捷指令、iOS Ve 通知 Hook 与合宙 724 取码</span>
           </div>
           <button className="icon-button" onClick={onClose} title="关闭教程" aria-label="关闭设备教程窗口"><X size={18} /></button>
         </div>
@@ -1576,9 +1576,10 @@ function DeviceTutorial({ onClose, releases }: { onClose: () => void; releases: 
           <button role="tab" aria-selected={tutorialTab === "androidApp"} className={tutorialTab === "androidApp" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("androidApp")}><Smartphone size={16} /> Android 应用</button>
           <button role="tab" aria-selected={tutorialTab === "androidRoot"} className={tutorialTab === "androidRoot" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("androidRoot")}><Smartphone size={16} /> Android Root 模块</button>
           <button role="tab" aria-selected={tutorialTab === "ios"} className={tutorialTab === "ios" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("ios")}><Smartphone size={16} /> iPhone 快捷指令</button>
+          <button role="tab" aria-selected={tutorialTab === "iosVe"} className={tutorialTab === "iosVe" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("iosVe")}><ShieldCheck size={16} /> iOS Ve 通知 Hook</button>
           <button role="tab" aria-selected={tutorialTab === "air724"} className={tutorialTab === "air724" ? "tutorial-tab active" : "tutorial-tab"} onClick={() => setTutorialTab("air724")}><Radio size={16} /> 合宙 724 取码</button>
         </div>
-        {tutorialTab === "androidApp" ? <AndroidAppTutorial latest={latestAndroid} /> : tutorialTab === "androidRoot" ? <AndroidRootTutorial latest={latestRoot} /> : tutorialTab === "ios" ? <IosTutorial /> : <Air724Tutorial />}
+        {tutorialTab === "androidApp" ? <AndroidAppTutorial latest={latestAndroid} /> : tutorialTab === "androidRoot" ? <AndroidRootTutorial latest={latestRoot} /> : tutorialTab === "ios" ? <IosTutorial /> : tutorialTab === "iosVe" ? <IosVeTutorial /> : <Air724Tutorial />}
         <div className="modal-actions"><button className="secondary-button" onClick={onClose}>关闭</button></div>
       </section>
     </div>
@@ -1868,6 +1869,132 @@ function AndroidRootTutorial({ latest }: { latest: ReleaseEntry | null }) {
   );
 }
 
+function IosVeTutorial() {
+  const downloadPath = "/assets/downloads/ve-tweak-source.zip";
+  const [downloadQr, setDownloadQr] = useState("");
+  useEffect(() => {
+    let active = true;
+    QRCode.toDataURL(`${window.location.origin}${downloadPath}`, {
+      width: 220,
+      margin: 1,
+      errorCorrectionLevel: "M",
+    }).then((value) => {
+      if (active) setDownloadQr(value);
+    }).catch(() => {
+      if (active) setDownloadQr("");
+    });
+    return () => { active = false; };
+  }, []);
+
+  return (
+    <div className="tutorial-content">
+      <p className="tutorial-lead">Ve 通知 Hook 适合已越狱、愿意自行编译的 iPhone。设备收到短信后，由 Ve 捕获系统通知并交给独立短信中转客户端，不读取“信息”数据库，也不上传附件。</p>
+      <div className="tutorial-warning">这里提供的是 <strong>GPL-3.0 源码集成包，不是预编译 deb</strong>。必须使用与越狱类型匹配的 Theos 工具链编译安装；当前源码固定适配 <strong>WingCH/Ve 2.3.4</strong>，不要直接套用到未审查的新版本。</div>
+      <div className="tutorial-download-panel">
+        <div>
+          <span className="tutorial-badge">源码包</span>
+          <h3>Ve SMS Relay 2.3.4 集成源码</h3>
+          <p>包含 Ve 补丁、SMSRelayClient、独立 tweak 示例、Makefile 与 GPL-3.0 许可文件。</p>
+          <a className="tutorial-download" href={downloadPath} download>下载 ve-tweak-source.zip</a>
+        </div>
+        <div className="tutorial-qr-panel">
+          {downloadQr ? <img className="tutorial-qr" src={downloadQr} alt="Ve 插件源码包下载二维码" /> : <div className="tutorial-qr-placeholder">二维码生成中</div>}
+          <span>扫码下载源码包<br />不是 deb 安装包</span>
+        </div>
+      </div>
+      <p className="tutorial-note">二维码使用当前后台地址生成。扫码手机必须能访问这个地址；若浏览器打开的是 <code>127.0.0.1</code> 或 <code>localhost</code>，请改用服务器局域网/公网地址重新打开后台，否则手机无法下载。</p>
+
+      <section className="tutorial-section" aria-labelledby="ios-ve-prereq-title">
+        <h3 id="ios-ve-prereq-title">1. 确认前置条件</h3>
+        <ol>
+          <li>iPhone 已越狱，并能使用 Sileo、Zebra 或 Filza；系统必须支持当前 Ve 版本的注入方式。</li>
+          <li>标准 rootless 越狱使用上游 Theos；RootHide / Relaxin 使用 <code>roothide/theos</code>，两种包不能混装。</li>
+          <li>准备 SSH/NewTerm、<code>git</code>、<code>make</code>、<code>ldid</code> 和可用的签名环境。不会编译时请继续使用“iPhone 快捷指令”，不要从不信任的第三方安装来路不明的 deb。</li>
+        </ol>
+        <p className="tutorial-note">上游基准：<a href="https://github.com/WingCH/Ve" target="_blank" rel="noreferrer">WingCH/Ve</a>，版本 <code>2.3.4</code>，提交 <code>a69204defc3e7fb6b14638f32dc8225807655aa9</code>，许可证 GPL-3.0。</p>
+      </section>
+
+      <section className="tutorial-section" aria-labelledby="ios-ve-device-title">
+        <h3 id="ios-ve-device-title">2. 在后台创建设备</h3>
+        <ol>
+          <li>进入“设备”页，点击“添加设备”，客户端选择“<strong>iOS Ve</strong>”，鉴权方式应为 HMAC。</li>
+          <li>复制只显示一次的 Device UUID 和 HMAC 密钥。不要把这两个值发到群聊、截图或公共仓库。</li>
+          <li>服务器根地址必须使用 <code>https://</code>，例如 <code>https://relay.example.com</code>。Ve 客户端不接受公网 HTTP，也不接受 URL 中带账号、查询参数或片段。</li>
+        </ol>
+      </section>
+
+      <section className="tutorial-section" aria-labelledby="ios-ve-build-title">
+        <h3 id="ios-ve-build-title">3. 合并补丁并编译 Ve</h3>
+        <ol>
+          <li>先下载上方源码包并解压。以下命令中的源码目录请替换为实际路径。</li>
+          <li>克隆 Ve 后切换到已审查的固定提交，再复制两个客户端文件并应用补丁。</li>
+        </ol>
+        <pre className="tutorial-code"><code>{[
+          'git clone https://github.com/WingCH/Ve.git',
+          'cd Ve',
+          'git checkout a69204defc3e7fb6b14638f32dc8225807655aa9',
+          '',
+          'RELAY_SRC=/path/to/ve-tweak-source',
+          'cp "$RELAY_SRC/SMSRelayClient.h" Manager/',
+          'cp "$RELAY_SRC/SMSRelayClient.m" Manager/',
+          'git apply "$RELAY_SRC/patches/ve-core-2.3.4-sms-relay.patch"',
+          'git diff --check',
+        ].join("\n")}</code></pre>
+        <p className="tutorial-note">补丁失败时不要强行修改：先确认提交号完全一致。补丁会保留 Ve 原有日志、拦截名单、Bark 和 AI 功能，并额外安装短信中转 Hook。</p>
+        <pre className="tutorial-code"><code>{[
+          '# 标准 rootless',
+          'make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless',
+          '',
+          '# RootHide / Relaxin',
+          'THEOS=/absolute/path/to/roothide-theos \\',
+          '  make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide',
+        ].join("\n")}</code></pre>
+        <p className="tutorial-note">编译结果通常位于 <code>packages/</code>。安装前核对包架构和越狱类型；不要同时安装独立 <code>VeSMSRelay</code> 与集成版，否则同一通知可能被处理两次。</p>
+      </section>
+
+      <section className="tutorial-section" aria-labelledby="ios-ve-config-title">
+        <h3 id="ios-ve-config-title">4. 写入中转配置</h3>
+        <p className="tutorial-note">配置与 Ve 自身偏好分离，路径固定为 <code>/var/mobile/Library/Preferences/com.smsrelay.ve.plist</code>。先用 Filza 或 NewTerm 创建文件，再把占位内容替换为后台生成的 HTTPS 地址、UUID 和 HMAC 密钥。</p>
+        <pre className="tutorial-code"><code>{[
+          '<?xml version="1.0" encoding="UTF-8"?>',
+          '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+          '<plist version="1.0">',
+          '<dict>',
+          '    <key>Enabled</key>',
+          '    <true/>',
+          '    <key>BaseURL</key>',
+          '    <string>https://relay.example.com</string>',
+          '    <key>DeviceID</key>',
+          '    <string>后台设备UUID</string>',
+          '    <key>HMACSecret</key>',
+          '    <string>后台HMAC密钥</string>',
+          '</dict>',
+          '</plist>',
+        ].join("\n")}</code></pre>
+        <pre className="tutorial-code"><code>{[
+          'chown mobile:mobile /var/mobile/Library/Preferences/com.smsrelay.ve.plist',
+          'chmod 0600 /var/mobile/Library/Preferences/com.smsrelay.ve.plist',
+          '# 修改后 Respring，让 SpringBoard 重新加载 Hook',
+        ].join("\n")}</code></pre>
+        <p className="tutorial-note">必须同时修正所有者与权限。SMSRelayClient 只接受由 SpringBoard 有效用户拥有、且组和其他用户没有任何权限的普通文件。</p>
+        <div className="tutorial-warning">密钥必须保持私密。不要开启 Ve 的“完整 API 捕获”来排查中转问题：该功能可能保存请求头、Token 和明文正文。</div>
+      </section>
+
+      <section className="tutorial-section" aria-labelledby="ios-ve-verify-title">
+        <h3 id="ios-ve-verify-title">5. 验证与排查</h3>
+        <ol>
+          <li>Respring 后，用另一台手机向这台 iPhone 发送一条<strong>新的</strong>普通短信，不要用 RCS / iMessage。</li>
+          <li>打开后台“消息”页，确认出现该短信记录，来源为 <code>ve_tweak</code>，且发送方与正文已按平台规则加密保存。</li>
+          <li>设备详情应能看到最近活动时间。首次测试不要用安装前的旧短信判断 Hook 是否生效。</li>
+          <li>没有记录时依次检查：配置路径、文件权限、BaseURL 是否为 HTTPS、UUID/密钥是否属于同一条设备、补丁是否编译进当前 Ve 包、Respring 是否完成。</li>
+          <li>返回 401/403 时，后台轮换或重新创建凭据后更新 plist，再次 Respring；不要把已撤销密钥继续重试。</li>
+          <li>补丁或编译失败时回到固定提交和对应工具链，不要混用 rootless 与 RootHide 包。</li>
+        </ol>
+        <p className="tutorial-result">隐私边界：客户端只处理短信通知的发送方、正文和通知时间；不上传附件，不查询“信息”数据库，不记录密钥、签名或短信正文。</p>
+      </section>
+    </div>
+  );
+}
 function IosTutorial() {
   const [iosFlow, setIosFlow] = useState<"import" | "manual">("import");
 

@@ -17,5 +17,8 @@
   "poll_interval_seconds": 3,
   "watcher_idle_seconds": 1,
   "max_backoff_seconds": 300,
-  "sms_database_path": ""
+  "sms_database_path": "",
+  "allow_query_battery": false,
+  "allow_query_recent_sms": false,
+  "allow_trigger_upload": false
 }

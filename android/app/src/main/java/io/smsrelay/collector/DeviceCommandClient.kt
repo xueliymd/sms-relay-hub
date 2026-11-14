@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.SystemClock
 import android.provider.Telephony
 import org.json.JSONArray
 import org.json.JSONObject
@@ -12,6 +13,14 @@ import java.net.URL
 import java.util.UUID
 
 data class PendingDeviceCommand(val id: String, val commandType: String)
+
+/** 指令回传中的发件人脱敏：仅保留长号码后 4 位，短值全部替换为星号。 */
+internal fun maskCommandSender(value: String?): String {
+    val text = value.orEmpty().trim()
+    if (text.isEmpty()) return "未知发件人"
+    if (text.length <= 4) return "*".repeat(text.length)
+    return "*".repeat(text.length - 4) + text.takeLast(4)
+}
 
 /**
  * 远程控制下行通道客户端：轮询待执行指令 + 回传执行结果。
@@ -149,7 +158,7 @@ object DeviceCommandExecutor {
                 while (cursor.moveToNext() && items.size < RECENT_SMS_LIMIT) {
                     items.add(
                         mapOf(
-                            "sender" to maskSender(cursor.getString(0)),
+                            "sender" to maskCommandSender(cursor.getString(0)),
                             "body" to cursor.getString(1)?.take(200),
                             "received_at" to cursor.getLong(2) / 1000L,
                         ),
@@ -172,17 +181,6 @@ object DeviceCommandExecutor {
         )
     }
 
-    /** 号码脱敏：保留后 4 位，其余用 * 代替；非数字（如 106 开头或英文发件人）原样返回。 */
-    private fun maskSender(value: String?): String {
-        val text = value.orEmpty().trim()
-        if (text.isEmpty()) return "未知发件人"
-        return if (text.length > 4) {
-            text.take(text.length - 4).map { '*' }.joinToString("") + text.takeLast(4)
-        } else {
-            text
-        }
-    }
-
     private const val RECENT_SMS_LIMIT = 5
 }
 
@@ -196,12 +194,13 @@ object DeviceCommandPoller {
 
     /** 两次轮询之间的最小间隔：短信密集时避免每条短信都多发一次 HTTP 请求。 */
     private const val MIN_POLL_INTERVAL_MS = 30_000L
-    @Volatile private var lastPollAt = 0L
+    @Volatile private var lastPollAt = -MIN_POLL_INTERVAL_MS
 
     fun poll(context: Context) {
         val appContext = context.applicationContext
+        if (!RelaySwitch.isEnabled(appContext)) return
         val config = SmsRelayRuntime.config(appContext) ?: return
-        val now = System.currentTimeMillis()
+        val now = SystemClock.elapsedRealtime()
         if (now - lastPollAt < MIN_POLL_INTERVAL_MS) return
         if (!polling.compareAndSet(false, true)) return
         lastPollAt = now

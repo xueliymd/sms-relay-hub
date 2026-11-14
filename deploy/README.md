@@ -10,7 +10,7 @@ pwsh -NoProfile -File deploy/package.ps1
 
 把生成的 `deploy/dist/sms-relay-hub-deploy.zip` 上传到服务器后解压，再在服务器上执行下面的初始化和 Compose 命令。
 
-全量部署包不嵌入容器全量包和容器在线更新包，只内置 Root 模块、iPhone 快捷指令、Android 采集端、Android 管理端和 Air724 脚本资源；各客户端发布历史最多打包最近两个版本。执行 `pwsh -NoProfile -File deploy/prune-dist.ps1 -Keep 2` 可把本机 `deploy/dist` 中更旧的全量/更新包移动到 `.backups/deploy-dist`，不会删除文件。
+全量部署包不嵌入容器全量包和容器在线更新包，只内置 Root 模块、iPhone 快捷指令、Android 采集端、Android 管理端和 Air724 脚本资源。打包默认保留各客户端最近两个版本；只做服务器更新时可用 `pwsh -NoProfile -File deploy/package.ps1 -ReleaseHistory 1` 生成仅含最新版的精简包，减少上传体积。执行 `pwsh -NoProfile -File deploy/prune-dist.ps1 -Keep 2` 可把本机 `deploy/dist` 中更旧的全量/更新包移动到 `.backups/deploy-dist`，不会删除文件。
 
 ```powershell
 pwsh -File deploy/bootstrap.ps1

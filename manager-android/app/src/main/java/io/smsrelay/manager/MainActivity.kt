@@ -780,15 +780,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 下发远程控制指令。结果不在同一次请求里返回 —— 设备要等下一次轮询（采集端最短 30 秒）
-     * 才会取走并执行，所以这里只确认"已下发"，再由 loadDeviceCommands 刷新回传结果。
+     * 下发远程控制指令。结果不在同一次请求里返回 —— Android 应用 / Root 模块通过约 60 秒
+     * 心跳领取并执行，所以这里只确认"已下发"，再由 loadDeviceCommands 刷新回传结果。
      */
     private fun sendDeviceCommand(device: AdminDevice, commandType: String) {
         val label = commandTypeLabel(commandType)
         confirm("下发指令", "向设备「${device.name}」下发「$label」？设备需在线运行采集端，并在采集端内开启了该指令授权。") {
             runAdminOp({ client, token -> client.createDeviceCommand(token, device.id, commandType) }) { command ->
                 deviceCommands = deviceCommands + (device.id to (listOf(command) + deviceCommands[device.id].orEmpty()))
-                dashboard?.connectionText?.text = "「$label」已下发，等待设备下一次轮询执行"
+                dashboard?.connectionText?.text = "「$label」已下发，等待设备心跳领取执行（约 60 秒一次，非实时）"
                 showTab(Tab.DEVICES)
                 loadDeviceCommands(listOf(device.id))
             }

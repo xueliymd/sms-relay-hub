@@ -74,13 +74,17 @@ DEVICE_COMMAND_TYPES = {
     "trigger_upload": "触发设备立即上报队列",
 }
 
+# 只有带常驻下行轮询器的客户端才能领取远程指令。iOS Ve 虽然也使用 HMAC，
+# 但 SpringBoard 内没有指令轮询器；合宙 724 等其他 HMAC 客户端同样不支持。
+DEVICE_COMMAND_CLIENT_TYPES = frozenset({"android_app", "root_module"})
+
 # 单设备未完成指令上限，防止误点/脚本刷屏把队列堆满
 DEVICE_COMMAND_QUEUE_LIMIT = 20
 # 已下发但迟迟没有结果（设备取走指令后进程被杀等）的重新投递等待时长
 DEVICE_COMMAND_REDELIVER_AFTER = timedelta(minutes=10)
-# 设备未领取/未回传的指令不能永久挂起。pending 超时后不再下发，sent 超时后
-# 也不再重投；两者最终都会显式变为 expired，管理端可据此重新下发。
-# 具体秒数由 settings 控制，默认 pending 10 分钟、sent 30 分钟。
+# 设备未领取/未回传的指令不能永久挂起。pending 超时后不再下发；sent 从
+# 实际领取时间起算回传窗口，并受 pending + result 总生命周期硬上限约束。
+# 两者最终都会显式变为 expired，管理端可据此重新下发。
 
 PHONE_NUMBER_PATTERN = re.compile(r"^\+?[0-9\s().-]+$")
 
@@ -2015,7 +2019,10 @@ class RelayStore:
                     template=spec.get("template"),
                 )
                 session.add(model)
-            return self.get_forwarding_rule(rule_id)
+            created = self.get_forwarding_rule(rule_id)
+            if created is None:
+                raise RuntimeError("forwarding_rule_creation_failed")
+            return created
 
     def update_forwarding_rule(self, rule_id: str, spec: dict[str, Any]) -> dict[str, Any] | None:
         with self.lock:
@@ -2156,6 +2163,8 @@ class RelayStore:
                     raise KeyError("device_not_found")
                 if not device.active:
                     raise ValueError("device_not_active")
+                if device.client_type not in DEVICE_COMMAND_CLIENT_TYPES:
+                    raise ValueError("command_not_supported")
                 now = utc_now()
                 self._expire_device_commands(session, now, device_id=str(device_id))
                 outstanding = session.scalar(
@@ -2282,6 +2291,12 @@ class RelayStore:
         """把超出生命周期的未完成指令显式收口为 expired。"""
         pending_before = now - timedelta(seconds=settings.device_command_pending_ttl_seconds)
         result_before = now - timedelta(seconds=settings.device_command_result_ttl_seconds)
+        # 已领取指令的回传窗口从 sent_at 起算；同时保留从创建时间起算的
+        # 总生命周期硬上限，避免设备反复重投把一条指令无限续期。
+        absolute_before = now - timedelta(
+            seconds=settings.device_command_pending_ttl_seconds
+            + settings.device_command_result_ttl_seconds
+        )
         statement = (
             update(DeviceCommandModel)
             .where(
@@ -2292,7 +2307,11 @@ class RelayStore:
                     ),
                     and_(
                         DeviceCommandModel.status == "sent",
-                        DeviceCommandModel.created_at <= result_before,
+                        DeviceCommandModel.sent_at.is_not(None),
+                        or_(
+                            DeviceCommandModel.sent_at <= result_before,
+                            DeviceCommandModel.created_at <= absolute_before,
+                        ),
                     ),
                 )
             )

@@ -248,7 +248,7 @@ class RelayAdminClient(
         return executeArray(request).objects().map(RelayJson::deviceCommand)
     }
 
-    /** 下发指令；设备在下一次轮询（采集端最短 30 秒间隔）时取走并执行。 */
+    /** 下发指令；Android 应用 / Root 模块通过约 60 秒心跳领取并执行，非实时。 */
     fun createDeviceCommand(token: String, deviceId: String, commandType: String): DeviceCommand {
         require(commandType in DEVICE_COMMAND_TYPES) { "不支持的指令类型：$commandType" }
         val body = JSONObject().put("command_type", commandType).toString()

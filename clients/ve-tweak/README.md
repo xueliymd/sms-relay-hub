@@ -93,8 +93,13 @@ repeated-byte, and placeholder secrets are rejected.
 Keep the plist private:
 
 ```sh
+chown mobile:mobile /var/mobile/Library/Preferences/com.smsrelay.ve.plist
 chmod 0600 /var/mobile/Library/Preferences/com.smsrelay.ve.plist
 ```
+
+Both commands are required. SMSRelayClient opens the plist only when its
+owner matches SpringBoard's effective user and when no group/other permission
+bits are present.
 
 The client opens this exact path with symlink following disabled, accepts only
 a regular file owned by the SpringBoard effective user, rejects all group/other

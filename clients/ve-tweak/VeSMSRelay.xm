@@ -5,6 +5,7 @@
 - (NSString *)sectionID;
 - (NSString *)title;
 - (NSString *)message;
+- (NSDate *)publicationDate;
 - (NSDate *)date;
 @end
 
@@ -18,14 +19,20 @@
     if (bulletin == nil ||
         ![bulletin respondsToSelector:@selector(sectionID)] ||
         ![bulletin respondsToSelector:@selector(title)] ||
-        ![bulletin respondsToSelector:@selector(message)] ||
-        ![bulletin respondsToSelector:@selector(date)]) {
+        ![bulletin respondsToSelector:@selector(message)]) {
         return;
     }
     id sectionValue = bulletin.sectionID;
     id senderValue = bulletin.title;
     id bodyValue = bulletin.message;
-    id dateValue = bulletin.date;
+    id dateValue = nil;
+    if ([bulletin respondsToSelector:@selector(publicationDate)]) {
+        dateValue = bulletin.publicationDate;
+    }
+    if (![dateValue isKindOfClass:[NSDate class]] &&
+        [bulletin respondsToSelector:@selector(date)]) {
+        dateValue = bulletin.date;
+    }
     if (![sectionValue isKindOfClass:[NSString class]] ||
         ![senderValue isKindOfClass:[NSString class]] ||
         ![bodyValue isKindOfClass:[NSString class]] ||

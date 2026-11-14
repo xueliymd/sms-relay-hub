@@ -32,9 +32,26 @@ WAKE_REQUESTED=0
 WAIT_PID=
 WATCHER_RETRY_AT=0
 MQTT_TOPIC_MAX_BYTES=512
+COMMAND_POLL_INTERVAL_SECONDS=60
+command_poll_fallback_elapsed=60
+last_command_poll=-1
 case "$WATCHER_IDLE_SECONDS" in
     ''|*[!0-9]*|0) WATCHER_IDLE_SECONDS=1 ;;
 esac
+
+command_clock_seconds() {
+    command_clock_value=$(date +%s 2>/dev/null || true)
+    case "$command_clock_value" in
+        ''|*[!0-9]*|0) ;;
+        *) printf '%s\n' "$command_clock_value"; return 0 ;;
+    esac
+    command_clock_uptime=$(cat /proc/uptime 2>/dev/null || true)
+    command_clock_uptime=${command_clock_uptime%%.*}
+    case "$command_clock_uptime" in
+        ''|*[!0-9]*) return 1 ;;
+        *) printf '%s\n' "$command_clock_uptime"; return 0 ;;
+    esac
+}
 
 write_runtime_status() {
     status_state=$1
@@ -471,7 +488,7 @@ parse_scalar_token() {
     esac
     token_value=$(trim_line "$token_value")
 
-    first_key_character=${key%${key#?}}
+    first_key_character=${key%"${key#?}"}
     remaining_key_characters=${key#?}
     case "$first_key_character" in
         [A-Za-z_]) ;;
@@ -486,7 +503,7 @@ parse_scalar_token() {
             value=${token_value#\"}
             value=${value%\"}
             case "$value" in
-                *'"'*|*'\'*) return 1 ;;
+                *'"'*|*\\*) return 1 ;;
             esac
             value_type=string
             ;;
@@ -510,11 +527,11 @@ parse_config() {
     config_open=0; config_closed=0; config_fields=0; config_previous_comma=0
     seen_schema_version=0; seen_enabled=0; seen_base_url=0; seen_allow_insecure_local_http=0; seen_transport_mode=0; seen_fallback_to_http=0; seen_device_id=0
     seen_hmac_secret=0; seen_source=0; seen_android_user_id=0; seen_initial_sync=0
-    seen_poll_interval=0; seen_max_backoff=0; seen_watcher_idle=0; seen_sms_database_path=0
+    seen_poll_interval=0; seen_max_backoff=0; seen_watcher_idle=0; seen_sms_database_path=0; seen_allow_query_battery=0; seen_allow_query_recent_sms=0; seen_allow_trigger_upload=0
     seen_mqtt_broker_url=0; seen_mqtt_topic=0; seen_mqtt_username=0; seen_mqtt_password=0
     config_schema_version=; enabled=; config_base_url=; allow_insecure_local_http=false; transport_mode=http; fallback_to_http=true; config_device_id=
     config_hmac_secret=; configured_source=; android_user_id=; initial_sync_mode=
-    poll_interval=; max_backoff=; watcher_idle=1; sms_database_path=; mqtt_broker_url=; mqtt_topic=; mqtt_username=; mqtt_password=
+    poll_interval=; max_backoff=; watcher_idle=1; sms_database_path=; mqtt_broker_url=; mqtt_topic=; mqtt_username=; mqtt_password=; allow_query_battery=false; allow_query_recent_sms=false; allow_trigger_upload=false
 
     raw_line=
     while IFS= read -r raw_line || [ -n "$raw_line" ]; do
@@ -551,6 +568,9 @@ parse_config() {
             max_backoff_seconds) [ "$value_type" = integer ] && [ "$seen_max_backoff" = 0 ] || return 1; seen_max_backoff=1; max_backoff=$value ;;
             watcher_idle_seconds) [ "$value_type" = integer ] && [ "$seen_watcher_idle" = 0 ] || return 1; seen_watcher_idle=1; watcher_idle=$value ;;
             sms_database_path) [ "$value_type" = string ] && [ "$seen_sms_database_path" = 0 ] || return 1; seen_sms_database_path=1; sms_database_path=$value ;;
+            allow_query_battery) [ "$value_type" = boolean ] && [ "$seen_allow_query_battery" = 0 ] || return 1; seen_allow_query_battery=1; allow_query_battery=$value ;;
+            allow_query_recent_sms) [ "$value_type" = boolean ] && [ "$seen_allow_query_recent_sms" = 0 ] || return 1; seen_allow_query_recent_sms=1; allow_query_recent_sms=$value ;;
+            allow_trigger_upload) [ "$value_type" = boolean ] && [ "$seen_allow_trigger_upload" = 0 ] || return 1; seen_allow_trigger_upload=1; allow_trigger_upload=$value ;;
             mqtt_broker_url) [ "$value_type" = string ] && [ "$seen_mqtt_broker_url" = 0 ] || return 1; seen_mqtt_broker_url=1; mqtt_broker_url=$value ;;
             mqtt_topic) [ "$value_type" = string ] && [ "$seen_mqtt_topic" = 0 ] || return 1; seen_mqtt_topic=1; mqtt_topic=$value ;;
             mqtt_username) [ "$value_type" = string ] && [ "$seen_mqtt_username" = 0 ] || return 1; seen_mqtt_username=1; mqtt_username=$value ;;
@@ -748,6 +768,34 @@ while [ ! -e "$DISABLED_MARKER" ]; do
     if [ "$enabled" != "true" ]; then
         wait_for_poll_or_wake "$poll_interval"
         continue
+    fi
+
+    # 远程控制指令与上报共用常驻 worker，但独立按 60 秒轮询，
+    # 避免空闲设备必须等到下一次短信上报才领取管理端指令。
+    command_now=$(command_clock_seconds 2>/dev/null || true)
+    command_poll_due=0
+    case "$command_now" in
+        ''|*[!0-9]*)
+            command_poll_fallback_elapsed=$((command_poll_fallback_elapsed + poll_interval))
+            if [ "$command_poll_fallback_elapsed" -ge "$COMMAND_POLL_INTERVAL_SECONDS" ]; then
+                command_poll_due=1
+            fi
+            ;;
+        *)
+            if [ "$last_command_poll" -lt 0 ] ||
+                [ "$command_now" -lt "$last_command_poll" ] ||
+                [ $((command_now - last_command_poll)) -ge "$COMMAND_POLL_INTERVAL_SECONDS" ]; then
+                command_poll_due=1
+            fi
+            ;;
+    esac
+    if [ "$command_poll_due" = 1 ]; then
+        SMS_RELAY_WAKE_HELPER="$MODDIR/system/bin/sms-relay-wake" "$RUNTIME" commands --config "$CONFIG_PATH" >/dev/null 2>&1 || true
+        case "$command_now" in
+            ''|*[!0-9]*) last_command_poll=-1 ;;
+            *) last_command_poll=$command_now ;;
+        esac
+        command_poll_fallback_elapsed=0
     fi
 
     upload_failed=0

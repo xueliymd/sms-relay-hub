@@ -16,10 +16,10 @@ if [ "$TARGET" = / ] || [ ! -f "$TARGET/deploy/compose.yml" ] || [ ! -f "$TARGET
     printf '%s\n' 'target is not a valid Relay Hub installation' >&2
     exit 2
 fi
-TARGET=$(CDPATH= cd "$TARGET" && pwd)
+TARGET=$(CDPATH='' cd "$TARGET" && pwd)
 
-SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
-SOURCE_ROOT=$(CDPATH= cd "$SCRIPT_DIR/.." && pwd)
+SCRIPT_DIR=$(CDPATH='' cd "$(dirname "$0")" && pwd)
+SOURCE_ROOT=$(CDPATH='' cd "$SCRIPT_DIR/.." && pwd)
 if [ ! -f "$SOURCE_ROOT/web/public/assets/releases/release-catalog.json" ]; then
     printf '%s\n' 'update package is missing the filtered release catalog' >&2
     exit 2
@@ -51,6 +51,23 @@ write_env_value() {
         sed -i "s|^${key}=.*|${key}=${value}|" "$TARGET/deploy/.env"
     else
         printf '%s=%s\n' "$key" "$value" >> "$TARGET/deploy/.env"
+    fi
+}
+
+# Older installations may pin the previous 30-minute OTP default in .env.
+# Keep values chosen by the operator, but migrate the historical default and
+# add settings introduced by newer releases so the running container actually
+# receives the same defaults as a fresh installation.
+migrate_env_defaults() {
+    otp_ttl=$(env_file_value OTP_TTL_SECONDS)
+    if [ -z "$otp_ttl" ] || [ "$otp_ttl" = "1800" ]; then
+        write_env_value OTP_TTL_SECONDS 600
+    fi
+    if [ -z "$(env_file_value DEVICE_COMMAND_PENDING_TTL_SECONDS)" ]; then
+        write_env_value DEVICE_COMMAND_PENDING_TTL_SECONDS 600
+    fi
+    if [ -z "$(env_file_value DEVICE_COMMAND_RESULT_TTL_SECONDS)" ]; then
+        write_env_value DEVICE_COMMAND_RESULT_TTL_SECONDS 1800
     fi
 }
 
@@ -205,6 +222,7 @@ cp -a "$SOURCE_ROOT/backend" "$SOURCE_ROOT/clients" "$SOURCE_ROOT/deploy" "$SOUR
 cp "$SOURCE_ROOT/README.md" "$SOURCE_ROOT/.dockerignore" "$TARGET/"
 cp "$BACKUP_DIR/deploy.env" "$TARGET/deploy/.env"
 write_env_value COMPOSE_PROJECT_NAME "$COMPOSE_PROJECT_NAME"
+migrate_env_defaults
 
 # Layer caching is content-addressed: COPY backend/ and COPY web/ invalidate
 # whenever sources change, so updates always rebuild what matters while

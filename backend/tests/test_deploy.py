@@ -271,7 +271,8 @@ def test_server_package_excludes_local_runtime_and_secret_files() -> None:
     assert "web/public/assets/releases/release-catalog.json" in package_script
     assert "release.download_url" in package_script
     assert 'platform -ne "deploy"' in package_script
-    assert "Select-Object -First 2" in package_script
+    assert "[ValidateRange(1, 2)]" in package_script
+    assert "Select-Object -First $ReleaseHistory" in package_script
     assert "web/public/downloads" in package_script
     assert "sms-relay-root-module-*.zip" in package_script
     assert "manager-android" in package_script

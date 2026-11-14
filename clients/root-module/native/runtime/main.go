@@ -406,6 +406,9 @@ type rootConfig struct {
 	MaxBackoffSeconds      int    `json:"max_backoff_seconds"`
 	WatcherIdleSeconds     int    `json:"watcher_idle_seconds"`
 	SMSDatabasePath        string `json:"sms_database_path"`
+	AllowQueryBattery      bool   `json:"allow_query_battery"`
+	AllowQueryRecentSMS    bool   `json:"allow_query_recent_sms"`
+	AllowTriggerUpload     bool   `json:"allow_trigger_upload"`
 }
 
 type readOptions struct {
@@ -932,6 +935,16 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(signature)
+	case "commands":
+		if len(os.Args) != 4 || os.Args[2] != "--config" {
+			fmt.Fprintln(os.Stderr, "usage_invalid")
+			os.Exit(2)
+		}
+		if err := runDeviceCommands(context.Background(), os.Args[3]); err != nil {
+			fmt.Fprintln(os.Stderr, "command_poll_failed")
+			os.Exit(1)
+		}
+		fmt.Println("commands_complete")
 	case "transport-upload":
 		options, err := parseTransportUploadOptions(os.Args[2:])
 		if err != nil {

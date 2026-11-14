@@ -1061,6 +1061,12 @@ async def create_device_command(
                 "command_queue_full",
                 "Too many outstanding commands; wait for the device to execute them",
             ) from exc
+        if str(exc) == "command_not_supported":
+            raise RelayError(
+                422,
+                "command_not_supported",
+                "This client type has no persistent command poller",
+            ) from exc
         raise RelayError(422, "invalid_command", str(exc)) from exc
 
 
@@ -1271,15 +1277,12 @@ def build_shortcut_payload(
 
     sender = "iPhone Messages"
     body: Any = message
-    # 幂等分钟桶必须锚定在服务器时钟上，而不是 received_at：
-    # iOS 端重发同一短信时 received_at 会变（重试跨分钟/时钟微差），
-    # 用它做桶会产生不同 client_message_id → 同一条短信入库两次。
-    # 该桶只用于幂等键，不对外展示。
-    idempotency_bucket = datetime.now(timezone.utc).replace(second=0, microsecond=0).isoformat()
+    # 服务器分钟只作为没有设备消息时间时的去重回退桶。设备消息里的 Date
+    # 稳定且随短信一起重发，不能依赖 received_at（快捷指令重试时会变）。
+    server_minute = datetime.now(timezone.utc).replace(second=0, microsecond=0).isoformat()
     # 展示用的短信时间优先级：设备消息里的 Date 字段 > 请求的 received_at
     # （iOS 设备时间）> 服务器分钟。配置了 received_at 的快捷指令将显示
     # 设备时间，而不是服务器生成时间。
-    server_minute = idempotency_bucket
     message_date = (
         now.replace(second=0, microsecond=0).isoformat()
         if received_at is not None
@@ -1338,8 +1341,10 @@ def build_shortcut_payload(
     if not isinstance(body, str) or not body.strip():
         raise ValueError("message content must be a non-empty string")
     body = body.strip()
-    # 幂等键只看 服务器分钟桶 + 发送方 + 正文；展示时间（message_date）
-    # 变化不影响去重。
+    # 设备消息时间存在时，用 Date 作为稳定去重锚点；只有缺失/无效 Date
+    # 才回退到服务器分钟。这样同一条带 Date 的短信跨分钟重发仍是同一个
+    # client_message_id，而服务器分钟桶也保留对普通文本的有限防重能力。
+    idempotency_bucket = message_date if message_date_source == "device" else server_minute
     canonical = f"ios-shortcut-v1\n{sender}\n{idempotency_bucket}\n{body}"
     client_message_id = "ios-shortcut-v1:" + hashlib.sha256(canonical.encode()).hexdigest()
     metadata: dict[str, Any] = {

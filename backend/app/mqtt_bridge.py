@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal, cast
 from urllib.parse import urlsplit
 
 LOGGER = logging.getLogger("sms_relay.mqtt_bridge")
@@ -20,7 +20,7 @@ class BridgeConfig:
     broker_host: str
     broker_port: int
     client_id: str
-    transport: str
+    transport: Literal["tcp", "websockets"]
     websocket_path: str
     topic_filter: str
     username: str
@@ -63,7 +63,7 @@ def parse_bridge_config(environ: Mapping[str, str] | None = None) -> BridgeConfi
     if not 1 <= broker_port <= 65535:
         raise ValueError("MQTT_BROKER_PORT must be between 1 and 65535")
 
-    transport = _env(values, "MQTT_TRANSPORT", "tcp").lower()
+    transport = cast(Literal["tcp", "websockets"], _env(values, "MQTT_TRANSPORT", "tcp").lower())
     if transport not in {"tcp", "websockets"}:
         raise ValueError("MQTT_TRANSPORT must be tcp or websockets")
 
@@ -153,12 +153,15 @@ def should_redeliver(status_code: int) -> bool:
 
 def run(config: BridgeConfig) -> None:
     try:
-        import paho.mqtt.client as mqtt  # type: ignore[import-untyped, import-not-found]
+        import paho.mqtt.client as mqtt
     except ImportError as error:
         raise RuntimeError("paho-mqtt is required for the MQTT bridge") from error
 
+    callback_api_version = getattr(mqtt, "CallbackAPIVersion", None)
+    if callback_api_version is None:
+        raise RuntimeError("paho-mqtt 2.x is required for the MQTT bridge")
     client = mqtt.Client(
-        mqtt.CallbackAPIVersion.VERSION2,
+        callback_api_version.VERSION2,
         client_id=config.client_id,
         clean_session=False,
         transport=config.transport,

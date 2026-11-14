@@ -7,7 +7,6 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from app.api import relay as relay_api
 from app.api.relay import build_shortcut_payload  # noqa: F401 - 确认模块可导入
 from app.services import forwarding as forwarding_module
 from tests.test_relay import ADMIN_HEADERS, create_device
@@ -210,7 +209,7 @@ def test_ingest_dispatches_to_forwarding_engine(client: TestClient, monkeypatch:
     auth = _auth(client)
     scheduled: list[Any] = []
     monkeypatch.setattr(
-        relay_api.forwarding_engine_instance,
+        forwarding_module.forwarding_engine,
         "schedule",
         lambda message: scheduled.append(message),
     )
@@ -233,7 +232,7 @@ def test_ingest_dispatches_to_forwarding_engine(client: TestClient, monkeypatch:
 
     # 直接驱动引擎（绕过异步调度）：webhook 发送被本地拒绝（不可达），验证重试后落失败日志
     async def run_process() -> None:
-        await relay_api.forwarding_engine_instance.process(message)
+        await forwarding_module.forwarding_engine.process(message)
 
     asyncio.run(run_process())
     logs = client.get(
@@ -252,7 +251,7 @@ def test_ingest_dispatch_success_records_success_log(
     auth = _auth(client)
     scheduled: list[Any] = []
     monkeypatch.setattr(
-        relay_api.forwarding_engine_instance,
+        forwarding_module.forwarding_engine,
         "schedule",
         lambda message: scheduled.append(message),
     )
@@ -262,7 +261,9 @@ def test_ingest_dispatch_success_records_success_log(
         headers=ADMIN_HEADERS,
     )
 
-    def fake_send(channel: str, target: str, title: str, content: str, *, timeout: int = 10):
+    def fake_send(
+        channel: str, target: str, title: str, content: str, *, timeout: int = 10
+    ) -> tuple[bool, int, str]:
         assert channel == "webhook"
         return True, 200, "HTTP 200"
 
@@ -276,7 +277,7 @@ def test_ingest_dispatch_success_records_success_log(
     assert response.status_code == 201
 
     async def run_process() -> None:
-        await relay_api.forwarding_engine_instance.process(scheduled[0])
+        await forwarding_module.forwarding_engine.process(scheduled[0])
 
     asyncio.run(run_process())
     logs = client.get(
@@ -293,7 +294,7 @@ def test_duplicate_message_is_not_forwarded_again(
     auth = _auth(client)
     scheduled: list[Any] = []
     monkeypatch.setattr(
-        relay_api.forwarding_engine_instance,
+        forwarding_module.forwarding_engine,
         "schedule",
         lambda message: scheduled.append(message),
     )

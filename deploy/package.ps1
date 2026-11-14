@@ -1,5 +1,7 @@
 param(
-    [string]$Output = "deploy/dist/sms-relay-hub-deploy.zip"
+    [string]$Output = "deploy/dist/sms-relay-hub-deploy.zip",
+    [ValidateRange(1, 2)]
+    [int]$ReleaseHistory = 2
 )
 
 $ErrorActionPreference = "Stop"
@@ -64,7 +66,7 @@ try {
             Where-Object { $_.platform -ne "deploy" } |
             Group-Object platform |
             ForEach-Object {
-                $_.Group | Sort-Object { [int]$_.version_code } -Descending | Select-Object -First 2
+                $_.Group | Sort-Object { [int]$_.version_code } -Descending | Select-Object -First $ReleaseHistory
             }
     )
     $catalog.releases = $includedReleases
@@ -159,6 +161,7 @@ try {
         "web/public/assets/downloads/air724-otp-websocket/config.example.lua",
         "web/public/assets/downloads/air724-otp-websocket/README.md",
         "web/public/assets/downloads/air724-mqtt-ingest.lua",
+        "web/public/assets/downloads/ve-tweak-source.zip",
         "clients/script_api/otp_client.py",
         "clients/script_api/README.md",
         "clients/air724/main.lua",

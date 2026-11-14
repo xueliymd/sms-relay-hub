@@ -136,9 +136,10 @@ def test_command_endpoints_reject_invalid_signature_and_device_mismatch(client: 
     # 签名无效
     broken = signed_headers(device_id, secret, b"", nonce="cmd-auth-1")
     broken["X-Signature"] = "AAAA"
-    assert client.get(
-        f"/api/v1/devices/{device_id}/commands/pending", headers=broken
-    ).status_code == 401
+    assert (
+        client.get(f"/api/v1/devices/{device_id}/commands/pending", headers=broken).status_code
+        == 401
+    )
 
     # 缺鉴权头
     assert client.get(f"/api/v1/devices/{device_id}/commands/pending").status_code == 401
@@ -180,9 +181,12 @@ def test_command_rejects_unsupported_type_and_revoked_device(client: TestClient)
     assert unsupported.json()["error"]["code"] == "invalid_command"
 
     # 撤销后：管理端不能再下发，设备也不能再轮询
-    assert client.delete(
-        f"/api/v1/admin/devices/{device_id}", headers={**ADMIN_HEADERS, "X-Nonce": "cmd-rev-1"}
-    ).status_code == 204
+    assert (
+        client.delete(
+            f"/api/v1/admin/devices/{device_id}", headers={**ADMIN_HEADERS, "X-Nonce": "cmd-rev-1"}
+        ).status_code
+        == 204
+    )
     revoked_issue = enqueue_command(client, device_id, "query_battery", "cmd-rev-2")
     assert revoked_issue.status_code == 409
     revoked_poll = client.get(
@@ -194,9 +198,12 @@ def test_command_rejects_unsupported_type_and_revoked_device(client: TestClient)
 
 def test_command_admin_endpoints_require_admin_token(client: TestClient) -> None:
     device_id, _ = create_hmac_device(client)
-    assert client.post(
-        f"/api/v1/admin/devices/{device_id}/commands", json={"command_type": "query_battery"}
-    ).status_code == 401
+    assert (
+        client.post(
+            f"/api/v1/admin/devices/{device_id}/commands", json={"command_type": "query_battery"}
+        ).status_code
+        == 401
+    )
     assert client.get(f"/api/v1/admin/devices/{device_id}/commands").status_code == 401
 
 
@@ -232,7 +239,7 @@ def test_stale_sent_command_is_redelivered_after_timeout(client: TestClient) -> 
         session.execute(
             update(DeviceCommandModel)
             .where(DeviceCommandModel.id == command_id)
-            .values(sent_at=utc_now() - timedelta(minutes=30))
+            .values(sent_at=utc_now() - timedelta(minutes=11))
         )
 
     redelivered = client.get(
@@ -245,7 +252,9 @@ def test_stale_sent_command_is_redelivered_after_timeout(client: TestClient) -> 
 def test_unclaimed_command_expires_instead_of_waiting_forever(client: TestClient) -> None:
     """软件未对接/长期不轮询时，pending 必须有明确终点而不是永久等待。"""
     device_id, secret = create_hmac_device(client)
-    command_id = enqueue_command(client, device_id, "query_battery", "cmd-expire-issue").json()["id"]
+    command_id = enqueue_command(client, device_id, "query_battery", "cmd-expire-issue").json()[
+        "id"
+    ]
 
     with store.session_factory.begin() as session:
         session.execute(
@@ -273,21 +282,40 @@ def test_unclaimed_command_expires_instead_of_waiting_forever(client: TestClient
     assert polled.json()["commands"] == []
 
 
-def test_sent_command_expires_when_result_never_arrives(client: TestClient) -> None:
-    """设备取走指令后一直不回传，sent 超过结果生命周期后也要收口。"""
+def test_sent_command_expires_from_claim_time_when_result_never_arrives(client: TestClient) -> None:
+    """已领取指令按 sent_at 计算 30 分钟回传窗口，同时仍受总生命周期硬上限约束。"""
     device_id, secret = create_hmac_device(client)
-    command_id = enqueue_command(client, device_id, "trigger_upload", "cmd-sent-expire-issue").json()["id"]
+    command_id = enqueue_command(
+        client, device_id, "trigger_upload", "cmd-sent-expire-issue"
+    ).json()["id"]
     client.get(
         f"/api/v1/devices/{device_id}/commands/pending",
         headers=signed_headers(device_id, secret, b"", nonce="cmd-sent-expire-poll"),
     )
+
+    now = utc_now()
+    with store.session_factory.begin() as session:
+        session.execute(
+            update(DeviceCommandModel)
+            .where(DeviceCommandModel.id == command_id)
+            .values(
+                created_at=now - timedelta(minutes=36),
+                sent_at=now - timedelta(minutes=26),
+            )
+        )
+
+    still_waiting = client.get(
+        f"/api/v1/admin/devices/{device_id}/commands",
+        headers={**ADMIN_HEADERS, "X-Nonce": "cmd-sent-still-waiting"},
+    ).json()
+    assert still_waiting[0]["status"] == "sent", "尚未满领取后的 30 分钟，不应提前过期"
 
     with store.session_factory.begin() as session:
         session.execute(
             update(DeviceCommandModel)
             .where(DeviceCommandModel.id == command_id)
             .values(
-                created_at=utc_now()
+                sent_at=utc_now()
                 - timedelta(seconds=settings.device_command_result_ttl_seconds + 1)
             )
         )
@@ -308,6 +336,55 @@ def test_sent_command_expires_when_result_never_arrives(client: TestClient) -> N
     assert late_result.json()["error"]["code"] == "command_expired"
 
 
+def test_sent_command_cannot_be_extended_forever_by_redelivery(client: TestClient) -> None:
+    """反复重投也不能无限续期：创建时间超过 pending + result 后必须收口。"""
+    device_id, secret = create_hmac_device(client)
+    command_id = enqueue_command(client, device_id, "query_battery", "cmd-hard-cap-issue").json()[
+        "id"
+    ]
+    client.get(
+        f"/api/v1/devices/{device_id}/commands/pending",
+        headers=signed_headers(device_id, secret, b"", nonce="cmd-hard-cap-poll"),
+    )
+
+    now = utc_now()
+    with store.session_factory.begin() as session:
+        session.execute(
+            update(DeviceCommandModel)
+            .where(DeviceCommandModel.id == command_id)
+            .values(
+                created_at=now
+                - timedelta(
+                    seconds=settings.device_command_pending_ttl_seconds
+                    + settings.device_command_result_ttl_seconds
+                    + 1
+                ),
+                sent_at=now,
+            )
+        )
+
+    listed = client.get(
+        f"/api/v1/admin/devices/{device_id}/commands",
+        headers={**ADMIN_HEADERS, "X-Nonce": "cmd-hard-cap-list"},
+    ).json()
+    assert listed[0]["status"] == "expired"
+
+
+def test_command_enqueue_rejects_clients_without_persistent_poller(client: TestClient) -> None:
+    """iOS Ve/HMAC 也不能接收下行指令，否则只会等到过期。"""
+    for index, client_type in enumerate(("ve_tweak", "air724_mqtt")):
+        created = create_device(client, client_type=client_type, auth_kind="hmac")
+        device_id = cast(str, created["device"]["id"])
+        response = enqueue_command(
+            client,
+            device_id,
+            "query_battery",
+            f"cmd-unsupported-{index}",
+        )
+        assert response.status_code == 422
+        assert response.json()["error"]["code"] == "command_not_supported"
+
+
 def test_command_list_rejects_unknown_device(client: TestClient) -> None:
     missing = client.get(
         "/api/v1/admin/devices/00000000-0000-0000-0000-000000000000/commands",
@@ -320,7 +397,9 @@ def test_command_list_rejects_unknown_device(client: TestClient) -> None:
 def test_recent_sms_result_stays_encrypted_at_rest(client: TestClient) -> None:
     """结果以密文入库：直接读表拿不到明文，只能经管理端 API 解密返回。"""
     device_id, secret = create_hmac_device(client)
-    command_id = enqueue_command(client, device_id, "query_recent_sms", "cmd-enc-issue").json()["id"]
+    command_id = enqueue_command(client, device_id, "query_recent_sms", "cmd-enc-issue").json()[
+        "id"
+    ]
     client.get(
         f"/api/v1/devices/{device_id}/commands/pending",
         headers=signed_headers(device_id, secret, b"", nonce="cmd-enc-poll"),
@@ -329,11 +408,14 @@ def test_recent_sms_result_stays_encrypted_at_rest(client: TestClient) -> None:
         {"result": {"count": 1, "messages": [{"sender": "****1234", "body": "验证码 9999"}]}},
         separators=(",", ":"),
     ).encode()
-    assert client.post(
-        f"/api/v1/devices/{device_id}/commands/{command_id}/result",
-        content=body,
-        headers=signed_headers(device_id, secret, body, nonce="cmd-enc-result"),
-    ).status_code == 200
+    assert (
+        client.post(
+            f"/api/v1/devices/{device_id}/commands/{command_id}/result",
+            content=body,
+            headers=signed_headers(device_id, secret, body, nonce="cmd-enc-result"),
+        ).status_code
+        == 200
+    )
 
     with store.session_factory() as session:
         model = session.get(DeviceCommandModel, command_id)

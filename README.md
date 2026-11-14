@@ -65,7 +65,7 @@ pwsh -File deploy/bootstrap.ps1
 - `ADMIN_TOKEN`：兼容现有维护脚本的恢复令牌；管理台不提供填写入口，日常使用用户名和密码登录。
 - `DATA_ENCRYPTION_KEY`：32 字节随机值的 base64url 编码。
 - `POSTGRES_PASSWORD`：URL 安全的随机密码。
-- `OTP_TTL_SECONDS`：访问码默认有效期，当前默认 `600` 秒（10 分钟）；已在服务器 `.env` 中显式写过旧值的，需要手动同步为 `600`。
+- `OTP_TTL_SECONDS`：访问码默认有效期，当前默认 `600` 秒（10 分钟）；更新脚本会自动把历史默认 `1800` 迁移为 `600`，管理员自定义的非默认值保持不变。
 - `DEVICE_COMMAND_PENDING_TTL_SECONDS`：设备未轮询时指令的等待上限，默认 `600` 秒；超时后状态变为 `expired`，不会永久停留在 `pending`。
 - `DEVICE_COMMAND_RESULT_TTL_SECONDS`：设备已领取但未回传结果的收口上限，默认 `1800` 秒；期间超过 10 分钟未回传会重新投递，最终仍未回传则变为 `expired`。
 - `DATABASE_URL`：例如 `postgresql+psycopg://sms_relay:<password>@postgres:5432/sms_relay`，初始化脚本会根据 PostgreSQL 参数自动生成。

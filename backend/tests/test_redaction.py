@@ -1,8 +1,6 @@
 from app.core.redaction import (
     mask_identifier,
-    mask_phone_number,
     redact_mapping,
-    scrub_metadata,
 )
 
 

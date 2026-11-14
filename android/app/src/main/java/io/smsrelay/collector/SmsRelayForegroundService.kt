@@ -14,8 +14,14 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class SmsRelayForegroundService : Service() {
+    private val commandPollExecutor = Executors.newSingleThreadScheduledExecutor { task ->
+        Thread(task, "sms-relay-command-heartbeat").apply { isDaemon = true }
+    }
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -51,6 +57,15 @@ class SmsRelayForegroundService : Service() {
 
         SmsRelayRuntime.serviceActive = true
         attachAppOverlayIfPossible()
+        // 指令下行复用既有 DeviceCommandPoller。前台服务存活时按 60 秒心跳领取，
+        // 避免设备长时间没有新短信时只能等 WorkManager 的 15 分钟兜底；
+        // DeviceCommandPoller 自带 30 秒防抖和重入保护，不会与短信上报冲突。
+        commandPollExecutor.scheduleWithFixedDelay(
+            { runCatching { DeviceCommandPoller.poll(this) } },
+            COMMAND_POLL_INITIAL_DELAY_SECONDS,
+            COMMAND_POLL_INTERVAL_SECONDS,
+            TimeUnit.SECONDS,
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -81,6 +96,7 @@ class SmsRelayForegroundService : Service() {
     }
 
     override fun onDestroy() {
+        commandPollExecutor.shutdownNow()
         SmsRelayRuntime.serviceActive = false
         KeepAliveOverlay.release(this, KeepAliveOverlay.APP_WINDOW_TYPE)
         super.onDestroy()
@@ -170,5 +186,7 @@ class SmsRelayForegroundService : Service() {
         const val ALERT_CHANNEL_ID = "relay_alerts"
         const val NOTIFICATION_ID = 2001
         const val BLOCKED_NOTIFICATION_ID = 2003
+        const val COMMAND_POLL_INITIAL_DELAY_SECONDS = 5L
+        const val COMMAND_POLL_INTERVAL_SECONDS = 60L
     }
 }

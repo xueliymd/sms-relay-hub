@@ -58,6 +58,13 @@ data class DeviceCommand(
     val isExpired: Boolean get() = status == "expired"
 }
 
+/**
+ * v1 下行指令只支持带常驻签名轮询器的客户端。
+ * iOS Ve、快捷指令、合宙 724 等没有命令轮询线程，不能进入下发目标列表。
+ */
+fun supportsDeviceCommands(clientType: String): Boolean =
+    clientType == "android_app" || clientType == "root_module"
+
 /** 指令类型的中文名，与后端 store.DEVICE_COMMAND_TYPES 的说明一一对应。 */
 fun commandTypeLabel(value: String): String = when (value) {
     "query_battery" -> "查询电量"

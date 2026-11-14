@@ -10,11 +10,13 @@ from tests.test_relay import ADMIN_HEADERS, create_device
 def _post(client: TestClient, token: str, received_at: Any, n: int) -> int:
     payload = {"message": f"Code {100000 + n}"}
     payload["received_at"] = received_at
-    return client.post(
+    return int(
+        client.post(
         "/api/v1/ingest/shortcut",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
-    ).status_code
+        ).status_code
+    )
 
 
 def test_received_at_never_causes_422(client: TestClient) -> None:
